@@ -1,0 +1,67 @@
+services:
+  dev:
+    container_name: server-dev
+    image: server-dev:1.0.0
+    build:
+      context: .
+      # Only will build development stage from our dockerfile
+      target: development
+      dockerfile: ./Dockerfile
+    command: npm run start:dev
+    ports:
+      - 3000:3000
+    networks:
+      - server-network
+    volumes:
+      # The volumes section enables the data to be persisted and is what makes the hot reloading possible
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    env_file:
+      - .env
+
+#   prod:
+#     container_name: server-prod
+#     image: server-prod:1.0.0
+#     build:
+#       context: .
+#       target: production
+#       dockerfile: ./Dockerfile
+#     command: npm run start:prod
+#     ports:
+#       - 3000:3000
+#     networks:
+#       - server-network
+#     depends_on:
+#       - mongodb
+#     volumes:
+#       - .:/usr/src/app
+#       - /usr/src/app/node_modules
+#     restart: unless-stopped
+
+  mongodb:
+    image: mongo:6.0.5
+    container_name: mongodb
+    networks:
+      - server-network
+    ports:
+      - 27017:27017
+    volumes:
+      - /database:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_DATABASE=template
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/template --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+
+  
+networks:
+  server-network:
+    driver: bridge
