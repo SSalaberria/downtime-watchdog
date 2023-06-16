@@ -1,6 +1,7 @@
 import { Logger as NestLogger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import mongoose from 'mongoose';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 import { middleware } from './app.middleware';
@@ -13,6 +14,9 @@ import { AppModule } from './app.module';
  */
 async function bootstrap(): Promise<string> {
   const isProduction = (process.env.NODE_ENV === 'production');
+
+  mongoose.set('debug', !isProduction);
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });

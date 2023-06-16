@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model, Types } from 'mongoose';
 import type mongoose from 'mongoose';
+import { Role, UserService } from 'src/shared/user';
 import { TrackerService } from 'src/tracker';
 
 import type { AddTrackerInput } from './dto';
@@ -13,6 +14,7 @@ import { DashboardNotFoundException } from './exceptions/DashboardNotFound.excep
 export class DashboardService {
   constructor(
     @InjectModel(Dashboard.name) private readonly dashboardModel: Model<DashboardDocument>,
+    @Inject(forwardRef(() => UserService)) private readonly users: UserService,
     private trackers: TrackerService,
   ) {}
 
@@ -32,7 +34,7 @@ export class DashboardService {
     return dashboard;
   }
 
-  async findByOwner(ownerId: Types.ObjectId): Promise<Dashboard> {
+  async findByOwner(ownerId: Types.ObjectId | mongoose.Schema.Types.ObjectId): Promise<Dashboard> {
     const dashboard = await this.dashboardModel.findOne({ owner: ownerId }).exec();
 
     if (!dashboard) {
@@ -42,16 +44,36 @@ export class DashboardService {
     return dashboard;
   }
 
-  async addTracker(dashboardId: mongoose.Schema.Types.ObjectId, addTrackerInput: AddTrackerInput): Promise<Dashboard> {
-    const newTracker = await this.trackers.create(addTrackerInput);
+  async findAdminDashboard(): Promise<Dashboard> {
+    const admins = await this.users.findAllByRole(Role.ADMIN);
 
-    const dashboard = await this.dashboardModel.findById(dashboardId).exec();
+    return this.findByOwner(admins[0]._id);
+  }
+
+  async addTracker(dashboardId: mongoose.Schema.Types.ObjectId, addTrackerInput: AddTrackerInput): Promise<Dashboard> {
+    // eslint-disable-next-line prefer-const
+    let [trackerToBeAdded, dashboard] = await Promise.all([
+      this.trackers.findByWebsite(addTrackerInput.website),
+      this.dashboardModel.findById(dashboardId).exec(),
+    ]);
 
     if (!dashboard) {
       throw new DashboardNotFoundException(`dashboard ID ${String(dashboardId)}`);
     }
 
-    dashboard.trackers.push(newTracker._id);
+    if (!trackerToBeAdded) {
+      trackerToBeAdded = await this.trackers.create(addTrackerInput);
+    } else {
+      const { _id: trackerId } = trackerToBeAdded;
+
+      const trackerAlreadyAdded = dashboard.trackers.some((tracker) => String(tracker) === String(trackerId));
+
+      if (trackerAlreadyAdded) {
+        return dashboard;
+      }
+    }
+
+    dashboard.trackers.push(trackerToBeAdded._id);
 
     return dashboard.save();
   }

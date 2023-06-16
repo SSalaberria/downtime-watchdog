@@ -1,0 +1,37 @@
+fragment dashboard on Dashboard {
+  trackers {
+    ...tracker
+  }
+}
+
+fragment tracker on Tracker {
+  website
+  _id
+  monthlyAvailability {
+    uptime
+    status
+  }
+  trackingLogs(sinceDate: $sinceDate) {
+    status
+    _id
+    createdAt
+  }
+}
+
+query GetUserDashboard($sinceDate: DateTime = null){
+  userDashboard {
+    ...dashboard
+  }
+}
+
+query GetDashboard($_id: String, $sinceDate: DateTime = null){
+  dashboard(_id: $_id) {
+    ...dashboard
+  }
+}
+
+mutation CreateTracker($website: String!, $sinceDate: DateTime = null) {
+  addTrackerToDashboard(AddTrackerInput: { website: $website }) {
+    ...dashboard
+  }
+}

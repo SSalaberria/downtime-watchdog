@@ -47,7 +47,7 @@
     "object-curly-spacing": "off",
     "@typescript-eslint/indent": ["error", 2, { "ignoredNodes": ["PropertyDefinition", "FunctionExpression", "ObjectExpression"] }],
 
-    "import/extensions": ["error", "never"],
+    "import/extensions": ["error", "never", { "interface": "always"}],
     // https://github.com/benmosher/eslint-plugin-import/issues/1753
     "import/named": "off",
     "import/no-default-export": "error",

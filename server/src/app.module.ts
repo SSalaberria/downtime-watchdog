@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { GqlModuleOptions, GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from 'nestjs-pino';
 
 import { BaseModule } from './base';
@@ -40,12 +41,12 @@ import { UserModule } from './shared/user';
       }),
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     // Service Modules
     CommonModule, // Global
     BaseModule,
     UserModule,
     DashboardModule,
-    // TrackerModule,
   ],
   providers: [
     // Global Guard, Authentication check on all routers

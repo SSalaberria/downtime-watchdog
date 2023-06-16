@@ -9,6 +9,7 @@ import type { GetUsersInput } from './dto/get-users.input';
 import type { UpdateUserInput } from './dto/update-user.input';
 import { User, UserDocument } from './entities/user.entity';
 import { UserNotFoundException } from './exceptions';
+import type { Role } from './user.interface';
 
 @Injectable()
 export class UserService {
@@ -42,6 +43,10 @@ export class UserService {
   public async findAll(paginationQuery: GetUsersInput): Promise<User[]> {
     const { limit, offset } = paginationQuery;
     return this.userModel.find().skip(offset).limit(limit).exec();
+  }
+
+  public async findAllByRole(role: Role): Promise<User[]> {
+    return this.userModel.find({ roles: role }).exec();
   }
 
   public async getUsers(paginationQuery: GetUsersInput): Promise<{ users: User[]; count: number }> {
