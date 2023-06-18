@@ -9,6 +9,7 @@ import { Tracker } from 'src/tracker';
 
 import { DashboardService } from './dashboard.service';
 import { AddTrackerInput, CreateDashboardInput } from './dto';
+import { RemoveTrackerInput } from './dto/remove-tracker.input';
 import { Dashboard, DashboardDocument } from './entities/dashboard.entity';
 
 @Resolver(() => Dashboard)
@@ -31,9 +32,9 @@ export class DashboardResolver {
   @UseGuards(JwtAuthGuard)
   @Query(() => Dashboard)
   async userDashboard(@ReqUser() user: Payload): Promise<Dashboard> {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 2000);
-    });
+    // await new Promise((resolve) => {
+    //   setTimeout(resolve, 2000);
+    // });
     return this.dashboardService.findByOwner(new Types.ObjectId(user.id));
   }
 
@@ -64,5 +65,16 @@ export class DashboardResolver {
     const dashboard = await this.dashboardService.findByOwner(new Types.ObjectId(user.id));
 
     return this.dashboardService.addTracker(dashboard._id, addTrackerInput);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Mutation(() => Dashboard)
+  async removeTrackerFromDashboard(
+    @Args('RemoveTrackerInput') removeTrackerInput: RemoveTrackerInput,
+    @ReqUser() user: Payload,
+  ): Promise<Dashboard> {
+    const dashboard = await this.dashboardService.findByOwner(new Types.ObjectId(user.id));
+
+    return this.dashboardService.removeTracker(dashboard._id, removeTrackerInput.trackerId);
   }
 }

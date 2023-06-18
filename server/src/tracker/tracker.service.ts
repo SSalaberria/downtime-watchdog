@@ -27,26 +27,13 @@ export class TrackerService implements OnApplicationBootstrap, OnModuleDestroy {
     const unknownLogs: TrackingLog[] = [];
 
     for (const tracker of trackers) {
-      const { _id: trackerId, website } = tracker;
+      const { _id: trackerId } = tracker;
 
       const lastLog = await this.trackingLogModel.findOne({ tracker: trackerId }).sort({ createdAt: -1 });
 
       unknownLogs.push(...getUnknownLogs(lastLog));
 
-      const job = new CronJob(CRON_JOB_PATTERN, () => {
-        this.httpService.get(website).subscribe({
-          next: () => {
-            void this.trackingLogModel.create({ tracker: trackerId, status: Status.UP });
-          },
-          error: () => {
-            void this.trackingLogModel.create({ tracker: trackerId, status: Status.DOWN });
-          },
-        });
-      });
-
-      this.schedulerRegistry.addCronJob(String(trackerId), job);
-
-      job.start();
+      this.activateTracker(tracker);
     }
 
     await this.trackingLogModel.insertMany(unknownLogs);
@@ -55,17 +42,42 @@ export class TrackerService implements OnApplicationBootstrap, OnModuleDestroy {
   async onModuleDestroy(): Promise<void> {
     const trackers = await this.findAll();
 
-    trackers.forEach((tracker) => {
-      const { _id: trackerId } = tracker;
+    for (const tracker of trackers) {
+      this.deactivateTracker(tracker);
+    }
+  }
 
-      const job = this.schedulerRegistry.getCronJob(String(trackerId));
+  activateTracker(tracker: Tracker): void {
+    const { _id: trackerId, website } = tracker;
 
-      job.stop();
+    const job = new CronJob(CRON_JOB_PATTERN, () => {
+      this.httpService.get(website).subscribe({
+        next: () => {
+          void this.trackingLogModel.create({ tracker: trackerId, status: Status.UP });
+        },
+        error: () => {
+          void this.trackingLogModel.create({ tracker: trackerId, status: Status.DOWN });
+        },
+      });
     });
+
+    this.schedulerRegistry.addCronJob(String(trackerId), job);
+
+    job.start();
+  }
+
+  deactivateTracker(tracker: Tracker): void {
+    const { _id: trackerId } = tracker;
+
+    const job = this.schedulerRegistry.getCronJob(String(trackerId));
+
+    job.stop();
   }
 
   async create(createTrackerInput: CreateTrackerInput): Promise<TrackerDocument> {
     const newTracker = await this.trackerModel.create(createTrackerInput);
+
+    this.activateTracker(newTracker);
 
     return newTracker.save();
   }
@@ -92,7 +104,14 @@ export class TrackerService implements OnApplicationBootstrap, OnModuleDestroy {
     const tracker = await this.findOne(id);
 
     await this.trackerModel.deleteOne({ _id: tracker._id }).exec();
+    await this.deleteLogs(tracker._id);
+
+    this.deactivateTracker(tracker);
 
     return tracker;
+  }
+
+  async deleteLogs(id: mongoose.Schema.Types.ObjectId): Promise<void> {
+    await this.trackingLogModel.deleteMany({ tracker: id }).exec();
   }
 }

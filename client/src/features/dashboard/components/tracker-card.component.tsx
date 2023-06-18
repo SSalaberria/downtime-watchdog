@@ -1,5 +1,6 @@
 import { ImageWithFallback } from "~/common/ui/ImageWithFallback";
-import { AvailabilityStatus, Status } from "~/common/types.generated";
+import { AvailabilityStatus } from "~/common/types.generated";
+import { TrashIcon } from "~/common/ui";
 
 import { TrackerFragment } from "../gql/documents.generated";
 
@@ -7,6 +8,7 @@ import { TrackingGraph } from "./tracking-graph.component";
 
 interface TrackerProps {
   data: TrackerFragment;
+  onRemove?: (trackerId: string) => void;
 }
 
 const AVAILABILITY_COLOR = {
@@ -16,9 +18,9 @@ const AVAILABILITY_COLOR = {
   [AvailabilityStatus.Unknown]: "text-gray-600",
 };
 
-export function TrackerCard({ data }: TrackerProps) {
+export function TrackerCard({ data, onRemove }: TrackerProps) {
   return (
-    <div className="flex flex-col justify-between rounded-lg border border-accent-1 bg-background-secondary p-6">
+    <div className="relative flex flex-col justify-between rounded-lg border border-accent-1 bg-background-secondary p-6">
       <div className="flex items-center gap-2">
         <ImageWithFallback
           alt={`${data.website} favicon`}
@@ -38,11 +40,18 @@ export function TrackerCard({ data }: TrackerProps) {
         <span className="text-xs font-light">Monthly availability</span>
       </div>
       <div className="flex w-full items-center">
-        <TrackingGraph logs={data.trackingLogs} />
-        {data.trackingLogs.length === 0 && (
-          <span className="mx-auto text-center text-gray-500">Not tracked yet.</span>
+        {data.trackingLogs.length === 0 ? (
+          <p className="mx-auto text-center text-gray-500">Not tracked yet.</p>
+        ) : (
+          <TrackingGraph logs={data.trackingLogs} />
         )}
       </div>
+
+      {onRemove && (
+        <button className="group/btn absolute -top-3 right-0" onClick={() => onRemove(data._id)}>
+          <TrashIcon className="w-8 fill-accent-1 transition-all group-hover/btn:fill-red-600" />
+        </button>
+      )}
     </div>
   );
 }

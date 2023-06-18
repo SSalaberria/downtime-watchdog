@@ -93,6 +93,7 @@ export type Mutation = {
   jwtRefresh: LoggedUserOutput;
   login: LoggedUserOutput;
   removeTracker: Tracker;
+  removeTrackerFromDashboard: Dashboard;
   updateUser: User;
 };
 
@@ -124,6 +125,11 @@ export type MutationLoginArgs = {
 
 export type MutationRemoveTrackerArgs = {
   _id: Scalars['String']['input'];
+};
+
+
+export type MutationRemoveTrackerFromDashboardArgs = {
+  RemoveTrackerInput: RemoveTrackerInput;
 };
 
 
@@ -170,6 +176,11 @@ export type QueryTrackerArgs = {
 
 export type RefreshJwtInput = {
   refresh_token: Scalars['String']['input'];
+};
+
+export type RemoveTrackerInput = {
+  /** ID of tracker to be removed from dashboard */
+  trackerId: Scalars['String']['input'];
 };
 
 /** Status of the tracker */

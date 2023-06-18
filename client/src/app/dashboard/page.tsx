@@ -20,7 +20,7 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col items-center">
       <TrackerInput className=" w-full sm:w-72" />
-      <Dashboard data={data.userDashboard} />
+      <Dashboard data={data.userDashboard} showActions={true} />
     </div>
   );
 }

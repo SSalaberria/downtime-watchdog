@@ -10,6 +10,7 @@ import { authLink } from "./links";
 export const { getClient } = registerApolloClient(() => {
   return new ApolloClient({
     cache: new InMemoryCache(),
+    connectToDevTools: true,
     link: ApolloLink.from([
       authLink,
       new HttpLink({

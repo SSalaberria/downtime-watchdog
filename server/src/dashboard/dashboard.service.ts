@@ -77,4 +77,23 @@ export class DashboardService {
 
     return dashboard.save();
   }
+
+  async removeTracker(dashboardId: mongoose.Schema.Types.ObjectId, trackerId: mongoose.Schema.Types.ObjectId): Promise<Dashboard> {
+    const [dashboard, dashboards] = await Promise.all([
+      this.dashboardModel.findById(dashboardId).exec(),
+      this.dashboardModel.find().exec(),
+    ]);
+
+    if (!dashboard) {
+      throw new DashboardNotFoundException(`dashboard ID ${String(dashboardId)}`);
+    }
+
+    dashboard.trackers = dashboard.trackers.filter((tracker) => String(tracker) !== String(trackerId));
+
+    if (dashboards.filter((dash) => dash.trackers.some((tracker) => String(tracker) === String(trackerId))).length === 1) {
+      await this.trackers.remove(trackerId);
+    }
+
+    return dashboard.save();
+  }
 }

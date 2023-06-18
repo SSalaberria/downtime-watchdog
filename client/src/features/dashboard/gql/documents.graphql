@@ -35,3 +35,11 @@ mutation CreateTracker($website: String!, $sinceDate: DateTime = null) {
     ...dashboard
   }
 }
+
+mutation RemoveTracker($_id: String!, $sinceDate: DateTime = null) {
+  removeTrackerFromDashboard(RemoveTrackerInput: { trackerId: $_id }) {
+    ...dashboard
+  }
+}
+
+
