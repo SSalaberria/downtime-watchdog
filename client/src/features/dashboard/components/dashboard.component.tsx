@@ -19,22 +19,15 @@ interface DashboardProps {
 export function Dashboard({ data, showActions }: DashboardProps) {
   const [removeTracker] = useMutation(RemoveTrackerDocument, {
     update(cache, { data }) {
-      console.log(
-        cache.readQuery({
-          query: GetUserDashboardDocument,
-        }),
-      );
-      // cache.modify({
-      //   fields: {
-      //     trackers(existingTrackers = [], { readField }) {
-      //       return existingTrackers.filter((trackerRef) => {
-      //         return data?.removeTrackerFromDashboard.trackers.every(
-      //           (tracker: any) => tracker._id !== readField("_id", trackerRef),
-      //         );
-      //       });
-      //     },
-      //   },
-      // });
+      cache.updateQuery({ query: GetUserDashboardDocument }, (cacheData: any) => {
+        return {
+          ...cacheData,
+          userDashboard: {
+            ...cacheData?.userDashboard,
+            trackers: data?.removeTrackerFromDashboard.trackers,
+          },
+        };
+      });
     },
   });
 
@@ -42,15 +35,15 @@ export function Dashboard({ data, showActions }: DashboardProps) {
     async (trackerId: string) => {
       await removeTracker({
         variables: { _id: trackerId },
-        // optimisticResponse: {
-        //   removeTrackerFromDashboard: {
-        //     __typename: "Dashboard",
-        //     trackers: data.trackers.filter((tracker) => tracker._id !== trackerId),
-        //   },
-        // },
+        optimisticResponse: {
+          removeTrackerFromDashboard: {
+            __typename: "Dashboard",
+            trackers: data.trackers.filter((tracker) => tracker._id !== trackerId),
+          },
+        },
       });
     },
-    [removeTracker],
+    [removeTracker, data.trackers],
   );
 
   return (

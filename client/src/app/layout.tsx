@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body
         className={twMerge(
-          "flex flex-col bg-background-secondary font-sans text-font",
+          "flex flex-col overflow-x-hidden bg-background-secondary font-sans text-font",
           inter.variable,
         )}
       >
@@ -29,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           <div className="flex min-h-screen bg-background-primary">
             <div className="mx-auto w-full max-w-7xl px-6 py-4">{children}</div>
+            <div id="portal-root" />
           </div>
         </ApolloWrapper>
       </body>

@@ -2,12 +2,28 @@
 
 import { useMutation } from "@apollo/client";
 import { InputHTMLAttributes, forwardRef } from "react";
+import { twMerge } from "tailwind-merge";
+
+import { AddIcon, LoadingIcon } from "~/common/ui";
 
 import { CreateTrackerDocument } from "../gql/documents.generated";
 
 export const TrackerInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
-  (props, _) => {
-    const [createTracker] = useMutation(CreateTrackerDocument);
+  ({ className, ...props }, _) => {
+    const [createTracker, { loading }] = useMutation(CreateTrackerDocument, {
+      update(cache, { data }) {
+        cache.modify({
+          fields: {
+            userDashboard(existingDashboard) {
+              return {
+                ...existingDashboard,
+                trackers: data?.addTrackerToDashboard.trackers,
+              };
+            },
+          },
+        });
+      },
+    });
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -16,7 +32,7 @@ export const TrackerInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTM
         websiteUrl: { value: string };
       };
 
-      await createTracker({
+      createTracker({
         variables: { website: websiteUrl.value },
       });
 
@@ -24,15 +40,24 @@ export const TrackerInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTM
     };
 
     return (
-      <form onSubmit={handleSubmit}>
+      <form className="relative" onSubmit={handleSubmit}>
         <input
           autoComplete="off"
+          className={twMerge(className, "pr-8")}
+          disabled={loading}
           id="websiteUrl"
           name="website-url"
           placeholder="https://www.google.com"
           type="url"
           {...props}
         />
+        <button className="absolute right-3 top-3" id="add-tracker-btn">
+          {loading ? (
+            <LoadingIcon className=" w-5 stroke-gray-500" />
+          ) : (
+            <AddIcon className="w-5 stroke-gray-500 hover:stroke-gray-400" />
+          )}
+        </button>
       </form>
     );
   },

@@ -62,6 +62,9 @@ export class DashboardResolver {
   @UseGuards(JwtAuthGuard)
   @Mutation(() => Dashboard)
   async addTrackerToDashboard(@Args('AddTrackerInput') addTrackerInput: AddTrackerInput, @ReqUser() user: Payload): Promise<Dashboard> {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000);
+    });
     const dashboard = await this.dashboardService.findByOwner(new Types.ObjectId(user.id));
 
     return this.dashboardService.addTracker(dashboard._id, addTrackerInput);
