@@ -62,11 +62,11 @@ export const TrackerCard = memo(function TrackerCard({ data, onRemove }: Tracker
         <div className="absolute -top-3 right-0 flex flex-row-reverse">
           {onRemove && (
             <button className="group/btn" onClick={() => onRemove(data._id)}>
-              <TrashIcon className="w-8 fill-accent-1 transition-all group-hover/btn:fill-red-600" />
+              <TrashIcon className="w-7 fill-gray-500 transition-all group-hover/btn:fill-red-600" />
             </button>
           )}
           <button className="group/btn" onClick={() => setIsOpen(true)}>
-            <ExpandIcon className="w-6 stroke-accent-1 group-hover/btn:stroke-gray-400" />
+            <ExpandIcon className="w-5 stroke-gray-500 transition-all group-hover/btn:stroke-gray-400" />
           </button>
         </div>
       </div>

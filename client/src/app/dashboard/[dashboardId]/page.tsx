@@ -5,11 +5,11 @@ import { getClient } from "~/lib/apollo";
 export default async function DashboardPage({ params }: { params: { dashboardId: string } }) {
   const { data } = await getClient().query({
     query: GetDashboardDocument,
-    variables: { last: 20, _id: params.dashboardId },
+    variables: { _id: params.dashboardId },
   });
 
   return (
-    <div>
+    <div className="flex flex-col items-center">
       <Dashboard data={data.dashboard} />
     </div>
   );

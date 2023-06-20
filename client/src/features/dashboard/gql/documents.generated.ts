@@ -4,6 +4,7 @@ import * as Types from "../../../common/types.generated";
 
 export type DashboardFragment = {
   __typename?: "Dashboard";
+  _id: string;
   trackers: Array<{
     __typename?: "Tracker";
     website: string;
@@ -47,6 +48,7 @@ export type GetUserDashboardQuery = {
   __typename?: "Query";
   userDashboard: {
     __typename?: "Dashboard";
+    _id: string;
     trackers: Array<{
       __typename?: "Tracker";
       website: string;
@@ -75,6 +77,7 @@ export type GetDashboardQuery = {
   __typename?: "Query";
   dashboard: {
     __typename?: "Dashboard";
+    _id: string;
     trackers: Array<{
       __typename?: "Tracker";
       website: string;
@@ -103,6 +106,7 @@ export type CreateTrackerMutation = {
   __typename?: "Mutation";
   addTrackerToDashboard: {
     __typename?: "Dashboard";
+    _id: string;
     trackers: Array<{
       __typename?: "Tracker";
       website: string;
@@ -131,6 +135,7 @@ export type RemoveTrackerMutation = {
   __typename?: "Mutation";
   removeTrackerFromDashboard: {
     __typename?: "Dashboard";
+    _id: string;
     trackers: Array<{
       __typename?: "Tracker";
       website: string;
@@ -208,6 +213,7 @@ export const DashboardFragmentDoc = {
       selectionSet: {
         kind: "SelectionSet",
         selections: [
+          { kind: "Field", name: { kind: "Name", value: "_id" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "trackers" },
@@ -342,6 +348,7 @@ export const GetUserDashboardDocument = {
       selectionSet: {
         kind: "SelectionSet",
         selections: [
+          { kind: "Field", name: { kind: "Name", value: "_id" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "trackers" },
@@ -446,6 +453,7 @@ export const GetDashboardDocument = {
       selectionSet: {
         kind: "SelectionSet",
         selections: [
+          { kind: "Field", name: { kind: "Name", value: "_id" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "trackers" },
@@ -562,6 +570,7 @@ export const CreateTrackerDocument = {
       selectionSet: {
         kind: "SelectionSet",
         selections: [
+          { kind: "Field", name: { kind: "Name", value: "_id" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "trackers" },
@@ -678,6 +687,7 @@ export const RemoveTrackerDocument = {
       selectionSet: {
         kind: "SelectionSet",
         selections: [
+          { kind: "Field", name: { kind: "Name", value: "_id" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "trackers" },

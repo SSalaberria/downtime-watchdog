@@ -51,7 +51,7 @@ export const TrackerInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTM
           type="url"
           {...props}
         />
-        <button className="absolute right-3 top-3" id="add-tracker-btn">
+        <button className="absolute right-3 top-3" disabled={props?.disabled} id="add-tracker-btn">
           {loading ? (
             <LoadingIcon className=" w-5 stroke-gray-500" />
           ) : (

@@ -18,10 +18,6 @@ export class DashboardResolver {
 
   @Query(() => Dashboard)
   async dashboard(@Args('_id', { type: () => String, nullable: true }) id: mongoose.Schema.Types.ObjectId | null): Promise<Dashboard> {
-    // await new Promise((resolve) => {
-    //   setTimeout(resolve, 2000);
-    // });
-
     if (!id) {
       return this.dashboardService.findAdminDashboard();
     }
@@ -32,9 +28,9 @@ export class DashboardResolver {
   @UseGuards(JwtAuthGuard)
   @Query(() => Dashboard)
   async userDashboard(@ReqUser() user: Payload): Promise<Dashboard> {
-    // await new Promise((resolve) => {
-    //   setTimeout(resolve, 2000);
-    // });
+    await new Promise((resolve) => {
+      setTimeout(resolve, 3000);
+    });
     return this.dashboardService.findByOwner(new Types.ObjectId(user.id));
   }
 
