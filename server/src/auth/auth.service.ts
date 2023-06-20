@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcrypt';
 
 import type { JwtPayload, JwtSign, Payload } from './auth.interface';
-import { UserDocument, UserService } from '../shared/user';
+import { CreateUserInput, UserDocument, UserService } from '../shared/user';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +18,10 @@ export class AuthService {
     }
 
     return null;
+  }
+
+  public async register(createUserInput: CreateUserInput): Promise<UserDocument> {
+    return this.user.create(createUserInput);
   }
 
   public validateRefreshToken(data: Payload, refreshToken: string): boolean {

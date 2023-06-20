@@ -1,11 +1,10 @@
 "use client";
 
 import { memo, useState } from "react";
-import { createPortal } from "react-dom";
 
 import { ImageWithFallback } from "~/common/ui/ImageWithFallback";
 import { AvailabilityStatus } from "~/common/types.generated";
-import { ExpandIcon, TrashIcon } from "~/common/ui";
+import { ExpandIcon, TrashIcon, Dialog } from "~/common/ui";
 
 import { TrackerFragment } from "../gql/documents.generated";
 
@@ -70,22 +69,12 @@ export const TrackerCard = memo(function TrackerCard({ data, onRemove }: Tracker
           </button>
         </div>
       </div>
-      {isOpen &&
-        createPortal(
-          <dialog
-            open
-            className={
-              "fixed inset-0 flex h-full w-screen items-center justify-center bg-[#00000090] p-10 font-sans text-font"
-            }
-            onClick={() => setIsOpen(false)}
-          >
-            <div className="relative flex flex-col gap-4 rounded-xl bg-background-primary p-6">
-              <div className=" self-center">{title}</div>
-              <TrackingGraph logs={data.trackingLogs} showAll={true} />
-            </div>
-          </dialog>,
-          document.getElementById("portal-root")!,
-        )}
+      {isOpen && (
+        <Dialog onClose={() => setIsOpen(false)}>
+          <div className=" self-center">{title}</div>
+          <TrackingGraph logs={data.trackingLogs} showAll={true} />
+        </Dialog>
+      )}
     </>
   );
 });

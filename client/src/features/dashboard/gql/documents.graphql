@@ -3,6 +3,9 @@ fragment dashboard on Dashboard {
   trackers {
     ...tracker
   }
+  owner {
+    name
+  }
 }
 
 fragment tracker on Tracker {

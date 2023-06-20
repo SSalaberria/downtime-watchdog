@@ -10,7 +10,7 @@ import { CreateTrackerDocument } from "../gql/documents.generated";
 
 export const TrackerInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   ({ className, ...props }, _) => {
-    const [createTracker, { loading }] = useMutation(CreateTrackerDocument, {
+    const [createTracker, { loading, error }] = useMutation(CreateTrackerDocument, {
       update(cache, { data }) {
         cache.modify({
           fields: {
@@ -22,6 +22,9 @@ export const TrackerInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTM
             },
           },
         });
+      },
+      onError(error) {
+        console.error(error);
       },
     });
 
@@ -40,8 +43,9 @@ export const TrackerInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTM
     };
 
     return (
-      <form className="relative" onSubmit={handleSubmit}>
+      <form className="relative flex flex-col items-center gap-2" onSubmit={handleSubmit}>
         <input
+          required
           autoComplete="off"
           className={twMerge(className, "pr-8")}
           disabled={loading}
@@ -58,6 +62,8 @@ export const TrackerInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTM
             <AddIcon className="w-5 stroke-gray-500 hover:stroke-gray-400" />
           )}
         </button>
+
+        {error && <p className="text-red-500">{error.message.split(":")[2]}</p>}
       </form>
     );
   },

@@ -9,7 +9,9 @@ export default async function DashboardPage({ params }: { params: { dashboardId:
   });
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-4">
+      <h1 className="text-2xl font-medium text-white">{`${data.dashboard.owner.name}'s dashboard`}</h1>
+
       <Dashboard data={data.dashboard} />
     </div>
   );

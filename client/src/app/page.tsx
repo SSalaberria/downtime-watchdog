@@ -1,5 +1,4 @@
-import { LoginForm } from "~/features/auth";
-import { Dashboard } from "~/features/dashboard";
+import { CreateDashboardCTA, Dashboard } from "~/features/dashboard";
 import { GetDashboardDocument } from "~/features/dashboard/gql/documents.generated";
 import { getClient } from "~/lib/apollo";
 
@@ -9,9 +8,9 @@ export default async function HomePage() {
   });
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-4">
+      <CreateDashboardCTA />
       <Dashboard data={data.dashboard} />
-      {/* <LoginForm /> */}
     </div>
   );
 }

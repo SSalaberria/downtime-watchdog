@@ -12,7 +12,7 @@ const inter = Inter({
 
 export const metadata = {
   title: "Downtime Watchdog",
-  description: "Downtime Watchdog - A simple uptime tracker",
+  description: "Downtime Watchdog - A basic but simple uptime tracker",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ApolloWrapper>
           <Navbar />
           <div className="flex min-h-screen bg-background-primary">
-            <div className="mx-auto w-full max-w-7xl px-6 py-4">{children}</div>
+            <div className="mx-auto w-full max-w-7xl overflow-hidden px-6 py-4">{children}</div>
             <div id="portal-root" />
           </div>
         </ApolloWrapper>

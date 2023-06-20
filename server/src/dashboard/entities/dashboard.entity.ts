@@ -16,7 +16,16 @@ export class Dashboard {
   @Field(() => User, { description: 'Owner of dashboard' })
   owner!: mongoose.Schema.Types.ObjectId | User;
 
-  @Prop({ required: true, default: [], type: [mongoose.Schema.Types.ObjectId], ref: 'Tracker' })
+  @Prop({
+    required: true,
+    default: [],
+    type: [mongoose.Schema.Types.ObjectId],
+    validate: [
+      (val: Array<mongoose.Schema.Types.ObjectId>): boolean => val.length <= 5,
+      'Cannot exceed the limit of 5 trackers per dashboard.',
+    ],
+    ref: 'Tracker',
+  })
   @Field(() => [Tracker], { description: 'Trackers on dashboard' })
   trackers!: mongoose.Schema.Types.ObjectId[];
 }

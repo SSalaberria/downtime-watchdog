@@ -8,14 +8,14 @@ import { useRouter } from "next/navigation";
 import { Button } from "~/common/ui/button";
 import { TOKEN_KEY } from "~/common";
 
-import { LoginDocument } from "../gql/documents.generated";
+import { LoginDocument, RegisterDocument } from "../gql/documents.generated";
 
-export function LoginForm() {
+export function RegisterForm() {
   const { push } = useRouter();
   const [, setCookie] = useCookies([TOKEN_KEY]);
-  const [login, { loading, error }] = useMutation(LoginDocument, {
+  const [register, { loading, error }] = useMutation(RegisterDocument, {
     onCompleted(data) {
-      setCookie(TOKEN_KEY, data.login.access_token, { path: "/" });
+      setCookie(TOKEN_KEY, data.register.access_token, { path: "/" });
 
       push("/dashboard");
     },
@@ -26,25 +26,31 @@ export function LoginForm() {
 
   const formFields = [
     { id: "email", label: "Email", type: "email" },
+    { id: "name", label: "Username", type: "text" },
     { id: "password", label: "Password", type: "password" },
+    { id: "repeatedPassword", label: "Repeat password", type: "password" },
   ];
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
 
-      console.log("wtf");
-
-      const { email, password } = e.target as typeof e.target & {
+      const { email, password, repeatedPassword, name } = e.target as typeof e.target & {
         email: { value: string };
         password: { value: string };
+        repeatedPassword: { value: string };
+        name: { value: string };
       };
 
-      await login({
-        variables: { email: email.value, password: password.value },
+      if (password.value !== repeatedPassword.value) {
+        return;
+      }
+
+      await register({
+        variables: { email: email.value, password: password.value, name: name.value },
       });
     },
-    [login],
+    [register],
   );
 
   return (
@@ -58,7 +64,7 @@ export function LoginForm() {
 
       {error && <p className="pb-1 text-center text-sm text-red-500">{error.message}</p>}
       <Button loading={loading} type="submit">
-        Login
+        Sign up
       </Button>
     </form>
   );

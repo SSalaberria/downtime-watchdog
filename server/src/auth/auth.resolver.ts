@@ -1,6 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { ReqUser } from 'src/common';
+import { CreateUserInput } from 'src/shared/user';
 
 import type { Payload } from './auth.interface';
 import { AuthService } from './auth.service';
@@ -20,6 +21,13 @@ export class AuthResolver {
     if (!user) {
       throw new InvalidCredentialsException();
     }
+
+    return this.auth.jwtSign(user as Payload);
+  }
+
+  @Mutation(() => LoggedUserOutput)
+  async register(@Args('createUserInput') createUserInput: CreateUserInput): Promise<LoggedUserOutput> {
+    const user = await this.auth.register(createUserInput);
 
     return this.auth.jwtSign(user as Payload);
   }

@@ -65,7 +65,7 @@ export class UserService {
     return user.save();
   }
 
-  public async create(createUserInput: CreateUserInput): Promise<User> {
+  public async create(createUserInput: CreateUserInput): Promise<UserDocument> {
     const session = await this.connection.startSession();
 
     session.startTransaction();

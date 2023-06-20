@@ -92,6 +92,7 @@ export type Mutation = {
   createUser: User;
   jwtRefresh: LoggedUserOutput;
   login: LoggedUserOutput;
+  register: LoggedUserOutput;
   removeTracker: Tracker;
   removeTrackerFromDashboard: Dashboard;
   updateUser: User;
@@ -120,6 +121,11 @@ export type MutationJwtRefreshArgs = {
 
 export type MutationLoginArgs = {
   loginUserInput: LoginUserInput;
+};
+
+
+export type MutationRegisterArgs = {
+  createUserInput: CreateUserInput;
 };
 
 

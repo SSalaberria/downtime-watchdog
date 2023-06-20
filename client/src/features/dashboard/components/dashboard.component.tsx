@@ -39,6 +39,7 @@ export function Dashboard({ data, showActions, loading }: DashboardProps) {
         optimisticResponse: {
           removeTrackerFromDashboard: {
             __typename: "Dashboard",
+            _id: data!._id,
             trackers: data!.trackers.filter((tracker) => tracker._id !== trackerId),
           },
         },
@@ -48,29 +49,31 @@ export function Dashboard({ data, showActions, loading }: DashboardProps) {
   );
 
   return (
-    <div className="flex w-full gap-2 p-2">
-      <div
-        className="grid w-full gap-4"
-        style={{
-          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-        }}
-      >
-        {!loading &&
-          data!.trackers.map((tracker) => (
-            <TrackerCard
-              key={tracker._id}
-              data={tracker}
-              {...(showActions && { onRemove: handleRemoveTracker })}
-            />
-          ))}
-        {!loading && data!.trackers.length === 0 && (
-          <p>No trackers have been added to this dashboard yet.</p>
-        )}
-        {loading &&
-          Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className=" h-60 animate-pulse rounded-lg bg-accent-1" />
-          ))}
-      </div>
+    <div className="flex w-full gap-2 p-2 text-center">
+      {!loading && data!.trackers.length === 0 ? (
+        <p className="w-full">No trackers have been added to this dashboard yet.</p>
+      ) : (
+        <div
+          className="grid w-full gap-4"
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(310px, 1fr))",
+          }}
+        >
+          {!loading &&
+            data!.trackers.map((tracker) => (
+              <TrackerCard
+                key={tracker._id}
+                data={tracker}
+                {...(showActions && { onRemove: handleRemoveTracker })}
+              />
+            ))}
+
+          {loading &&
+            Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className=" h-60 animate-pulse rounded-lg bg-accent-1" />
+            ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -28,9 +28,6 @@ export class DashboardResolver {
   @UseGuards(JwtAuthGuard)
   @Query(() => Dashboard)
   async userDashboard(@ReqUser() user: Payload): Promise<Dashboard> {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 3000);
-    });
     return this.dashboardService.findByOwner(new Types.ObjectId(user.id));
   }
 
