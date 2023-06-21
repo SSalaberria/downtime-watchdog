@@ -47,7 +47,7 @@ export class DashboardService {
   async findAdminDashboard(): Promise<Dashboard> {
     const admins = await this.users.findAllByRole(Role.ADMIN);
 
-    return this.findByOwner(admins[0]._id);
+    return this.findByOwner(admins[0]?._id);
   }
 
   async addTracker(dashboardId: mongoose.Schema.Types.ObjectId, addTrackerInput: AddTrackerInput): Promise<Dashboard> {

@@ -4,6 +4,6 @@ export const config = {
   },
   graphql: {
     debug: false,
-    playground: false,
+    // playground: false,
   },
 };

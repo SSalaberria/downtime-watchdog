@@ -28,7 +28,7 @@ query GetUserDashboard($sinceDate: DateTime = null){
   }
 }
 
-query GetDashboard($_id: String, $sinceDate: DateTime = null){
+query GetDashboard($_id: String = null, $sinceDate: DateTime = null){
   dashboard(_id: $_id) {
     ...dashboard
   }

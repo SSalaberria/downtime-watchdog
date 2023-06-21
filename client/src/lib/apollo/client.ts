@@ -3,7 +3,7 @@ import { registerApolloClient } from "@apollo/experimental-nextjs-app-support/rs
 
 import { env } from "~/env.mjs";
 
-import { authLink } from "./links";
+import { authLink, errorLink } from "./links";
 
 // Usable for RSC
 
@@ -13,6 +13,7 @@ export const { getClient } = registerApolloClient(() => {
     connectToDevTools: true,
     link: ApolloLink.from([
       authLink,
+      errorLink,
       new HttpLink({
         // https://studio.apollographql.com/public/spacex-l4uc6p/
         uri: env.NEXT_PUBLIC_GRAPHQL_URL,
