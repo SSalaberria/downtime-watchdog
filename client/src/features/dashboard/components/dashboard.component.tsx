@@ -38,8 +38,7 @@ export function Dashboard({ data, showActions, loading }: DashboardProps) {
         variables: { _id: trackerId },
         optimisticResponse: {
           removeTrackerFromDashboard: {
-            __typename: "Dashboard",
-            _id: data!._id,
+            ...data!,
             trackers: data!.trackers.filter((tracker) => tracker._id !== trackerId),
           },
         },
