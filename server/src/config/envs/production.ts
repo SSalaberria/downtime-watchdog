@@ -1,5 +1,7 @@
 export const config = {
-  db: {},
+  db: {
+    uri: process.env.MONGODB_URI,
+  },
   graphql: {
     debug: false,
     playground: false,
