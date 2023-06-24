@@ -18,6 +18,7 @@ export class TrackerService implements OnApplicationBootstrap, OnModuleDestroy {
   public constructor(
     @InjectModel(Tracker.name) private readonly trackerModel: Model<TrackerDocument>,
     @InjectModel(TrackingLog.name) private readonly trackingLogModel: Model<TrackingLogDocument>,
+    // private readonly
     private readonly schedulerRegistry: SchedulerRegistry,
     private readonly httpService: HttpService,
   ) {}
@@ -57,6 +58,8 @@ export class TrackerService implements OnApplicationBootstrap, OnModuleDestroy {
         },
         error: () => {
           void this.trackingLogModel.create({ tracker: trackerId, status: Status.DOWN });
+
+          // Get user emails from the dashboards that are subscribed to this tracker:
         },
       });
     });

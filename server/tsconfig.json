@@ -34,6 +34,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "__dirname"
+  },
   "include": ["typings/global.d.ts", "src/**/*", "test/**/*", "bin/**/*"],
   "exclude": ["node_modules"]
 }

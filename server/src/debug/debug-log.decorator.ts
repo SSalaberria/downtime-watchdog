@@ -63,7 +63,7 @@ const ClassLog = (context?: string): ClassDecorator => (
         const metadataKeys = Reflect.getMetadataKeys(originalMethod);
         for (const key of metadataKeys) {
           const value: unknown = Reflect.getMetadata(key, originalMethod);
-          Reflect.defineMetadata(key, value, <object>descriptor.value);
+          Reflect.defineMetadata(key, value, descriptor.value as object);
         }
       }
 
@@ -75,7 +75,7 @@ const ClassLog = (context?: string): ClassDecorator => (
 export const DebugLog = (context?: string): ClassDecorator & MethodDecorator => (
   (target: object, propertyKey?: string | symbol, descriptor?: PropertyDescriptor): void => {
     if (!descriptor) {
-      ClassLog(context)(<Func>target);
+      ClassLog(context)(target as Func);
     } else if (propertyKey) {
       MethodLog(context)(target, propertyKey, descriptor);
     }

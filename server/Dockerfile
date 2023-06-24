@@ -1,65 +1,30 @@
-###################
-# BUILD FOR LOCAL DEVELOPMENT
-###################
+FROM debian:bullseye as builder
 
-FROM node:16.20-alpine As development
+ENV PATH=/usr/local/node/bin:$PATH
+ARG NODE_VERSION=16.10.0
 
-# Create app directory
-WORKDIR /usr/src/app
+RUN apt-get update; apt install -y curl python-is-python3 pkg-config build-essential && \
+    curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
+    /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
+rm -rf /tmp/node-build-master
 
-# Copy application dependency manifests to the container image.
-# A wildcard is used to ensure copying both package.json AND package-lock.json (when available).
-# Copying this first prevents re-running npm install on every code change.
-COPY --chown=node:node package*.json ./
+RUN mkdir /app
+WORKDIR /app
 
-# Install app dependencies using the `npm install` command 
-RUN npm install
+COPY . .
 
-# Bundle app source
-COPY --chown=node:node . .
+RUN npm install && npm run build
 
-# Use the node user from the image (instead of the root user)
-USER node
 
-###################
-# BUILD FOR PRODUCTION
-###################
+FROM debian:bullseye-slim
 
-FROM node:16.20-alpine As build
+LABEL fly_launch_runtime="nodejs"
 
-WORKDIR /usr/src/app
+COPY --from=builder /usr/local/node /usr/local/node
+COPY --from=builder /app /app
 
-COPY --chown=node:node package*.json ./
-
-# In order to run `npm run build` we need access to the Nest CLI.
-# The Nest CLI is a dev dependency,
-# In the previous development stage we ran `npm install` which installed all dependencies.
-# So we can copy over the node_modules directory from the development image into this build image.
-COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
-
-COPY --chown=node:node . .
-
-# Run the build command which creates the production bundle
-RUN npm run build
-
-# Set NODE_ENV environment variable
+WORKDIR /app
 ENV NODE_ENV production
+ENV PATH /usr/local/node/bin:$PATH
 
-# Passing in --only=production ensures that only the production dependencies are installed.
-# This ensures that the node_modules directory is as optimized as possible.
-RUN npm install --only=production && npm cache clean --force
-
-USER node
-
-###################
-# PRODUCTION
-###################
-
-FROM node:16.20-alpine As production
-
-# Copy the bundled code from the build stage to the production image
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
-
-# Start the server using the production build
-CMD [ "node", "dist/app.js" ]
+CMD [ "npm", "run", "start" ]

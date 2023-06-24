@@ -3,6 +3,7 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { GqlModuleOptions, GraphQLModule } from '@nestjs/graphql';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from 'nestjs-pino';
@@ -12,7 +13,6 @@ import { CommonModule, ExceptionsFilter } from './common';
 import { configuration, loggerOptions } from './config';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { UserModule } from './shared/user';
-// import { TrackerModule } from './tracker/tracker.module';
 
 @Module({
   imports: [
@@ -42,6 +42,21 @@ import { UserModule } from './shared/user';
       inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),
+    ClientsModule.register([
+      {
+        name: 'HERO_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: 'hero',
+            brokers: ['localhost:9092'],
+          },
+          consumer: {
+            groupId: 'hero-consumer',
+          },
+        },
+      },
+    ]),
     // Service Modules
     CommonModule, // Global
     BaseModule,

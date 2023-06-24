@@ -15,7 +15,7 @@ export class DashboardService {
   constructor(
     @InjectModel(Dashboard.name) private readonly dashboardModel: Model<DashboardDocument>,
     @Inject(forwardRef(() => UserService)) private readonly users: UserService,
-    private trackers: TrackerService,
+    private readonly trackers: TrackerService,
   ) {}
 
   async create(createDashboardInput: CreateDashboardInput): Promise<Dashboard> {
