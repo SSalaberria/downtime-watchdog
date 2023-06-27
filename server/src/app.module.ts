@@ -2,8 +2,8 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GqlModuleOptions, GraphQLModule } from '@nestjs/graphql';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from 'nestjs-pino';
@@ -12,6 +12,7 @@ import { BaseModule } from './base';
 import { CommonModule, ExceptionsFilter } from './common';
 import { configuration, loggerOptions } from './config';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { MailModule } from './shared/mail/mail.module';
 import { UserModule } from './shared/user';
 
 @Module({
@@ -42,26 +43,13 @@ import { UserModule } from './shared/user';
       inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),
-    ClientsModule.register([
-      {
-        name: 'HERO_SERVICE',
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            clientId: 'hero',
-            brokers: ['localhost:9092'],
-          },
-          consumer: {
-            groupId: 'hero-consumer',
-          },
-        },
-      },
-    ]),
+    EventEmitterModule.forRoot(),
     // Service Modules
     CommonModule, // Global
     BaseModule,
     UserModule,
     DashboardModule,
+    MailModule,
   ],
   providers: [
     // Global Guard, Authentication check on all routers

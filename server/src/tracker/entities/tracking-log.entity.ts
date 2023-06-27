@@ -29,6 +29,10 @@ export class TrackingLog {
   @Prop({ required: true, enum: Object.values(Status) })
   @Field(() => Status, { description: 'Registered status' })
   status!: Status;
+
+  @Prop({ required: false, default: null, type: Number })
+  @Field(() => Number, { description: 'Response time', nullable: true })
+  responseTime!: number | null;
 }
 
 const TrackingLogSchema = SchemaFactory.createForClass(TrackingLog);

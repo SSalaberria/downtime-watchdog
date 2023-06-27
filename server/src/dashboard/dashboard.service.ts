@@ -1,9 +1,11 @@
 import { Injectable, forwardRef, Inject } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model, Types } from 'mongoose';
 import type mongoose from 'mongoose';
-import { Role, UserService } from 'src/shared/user';
-import { TrackerService } from 'src/tracker';
+import { MailService } from 'src/shared/mail';
+import { Role, User, UserService } from 'src/shared/user';
+import { TrackedErrorEvent, TrackerService } from 'src/tracker';
 
 import type { AddTrackerInput } from './dto';
 import type { CreateDashboardInput } from './dto/create-dashboard.input';
@@ -16,7 +18,21 @@ export class DashboardService {
     @InjectModel(Dashboard.name) private readonly dashboardModel: Model<DashboardDocument>,
     @Inject(forwardRef(() => UserService)) private readonly users: UserService,
     private readonly trackers: TrackerService,
+    private readonly email: MailService,
   ) {}
+
+  @OnEvent(TrackedErrorEvent.name)
+  async handleTrackerErrorEvent(payload: TrackedErrorEvent): Promise<void> {
+    const dashboards = await this.dashboardModel.find({ trackers: payload.trackerId }).populate('owner').exec();
+
+    const notifsPromises = dashboards.map(async (dashboard) => {
+      const { owner } = dashboard;
+
+      return this.email.notifyDowntime(owner as User, payload.website);
+    });
+
+    await Promise.all(notifsPromises);
+  }
 
   async create(createDashboardInput: CreateDashboardInput): Promise<Dashboard> {
     const newDashboard = await this.dashboardModel.create({ ...createDashboardInput });

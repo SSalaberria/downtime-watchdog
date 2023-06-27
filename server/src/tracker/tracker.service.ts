@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 import { HttpService } from '@nestjs/axios';
 import { Injectable, OnApplicationBootstrap, OnModuleDestroy } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import type { AxiosResponse } from 'axios';
 import { CronJob } from 'cron';
-import type { Model } from 'mongoose';
 import type mongoose from 'mongoose';
+import type { Model } from 'mongoose';
 
 import type { CreateTrackerInput } from './dto/create-tracker.input';
+import { TrackedErrorEvent } from './dto/tracked-error.event';
 import { Tracker, TrackerDocument, TrackingLog, TrackingLogDocument } from './entities';
 import { TrackerNotFoundException } from './exceptions';
 import { CRON_JOB_PATTERN } from './tracker.consts';
@@ -18,7 +22,7 @@ export class TrackerService implements OnApplicationBootstrap, OnModuleDestroy {
   public constructor(
     @InjectModel(Tracker.name) private readonly trackerModel: Model<TrackerDocument>,
     @InjectModel(TrackingLog.name) private readonly trackingLogModel: Model<TrackingLogDocument>,
-    // private readonly
+    private eventEmitter: EventEmitter2,
     private readonly schedulerRegistry: SchedulerRegistry,
     private readonly httpService: HttpService,
   ) {}
@@ -53,13 +57,15 @@ export class TrackerService implements OnApplicationBootstrap, OnModuleDestroy {
 
     const job = new CronJob(CRON_JOB_PATTERN, () => {
       this.httpService.get(website).subscribe({
-        next: () => {
-          void this.trackingLogModel.create({ tracker: trackerId, status: Status.UP });
-        },
-        error: () => {
-          void this.trackingLogModel.create({ tracker: trackerId, status: Status.DOWN });
+        next: (res) => {
+          const { responseTime } = res as AxiosResponse & { responseTime: number };
 
-          // Get user emails from the dashboards that are subscribed to this tracker:
+          void this.trackingLogModel.create({ tracker: trackerId, status: Status.UP, responseTime });
+        },
+        error: ({ responseTime }) => {
+          void this.trackingLogModel.create({ tracker: trackerId, status: Status.DOWN, responseTime });
+
+          this.eventEmitter.emit(TrackedErrorEvent.name, new TrackedErrorEvent(trackerId, tracker.website));
         },
       });
     });

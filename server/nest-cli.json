@@ -4,6 +4,7 @@
   "compilerOptions": {
     "tsConfigPath": "tsconfig.build.json",
     "deleteOutDir": true,
+    "assets": ["**/*.hbs"],
     "plugins": [{
       "name": "@nestjs/graphql",
       "options": { "introspectComments": true }

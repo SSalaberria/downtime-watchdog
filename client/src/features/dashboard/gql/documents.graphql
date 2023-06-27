@@ -19,6 +19,7 @@ fragment tracker on Tracker {
     status
     _id
     createdAt
+    responseTime
   }
 }
 

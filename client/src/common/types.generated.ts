@@ -220,6 +220,8 @@ export type TrackingLog = {
   _id: Scalars['String']['output'];
   /** Date of the tracking log */
   createdAt: Scalars['DateTime']['output'];
+  /** Response time */
+  responseTime?: Maybe<Scalars['Float']['output']>;
   /** Registered status */
   status: Status;
   /** Tracker ID */

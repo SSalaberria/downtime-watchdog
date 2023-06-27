@@ -19,6 +19,12 @@ export const config = {
     jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
     salt: process.env.SALT,
   },
+  smtp: {
+    host: process.env.SMTP_HOST,
+    user: process.env.SMTP_USER,
+    password: process.env.SMTP_PASSWORD,
+    from: process.env.SMTP_FROM,
+  },
   jwtSecret: process.env.JWT_SECRET,
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
 };

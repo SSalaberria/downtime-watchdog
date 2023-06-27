@@ -8,7 +8,10 @@ import { TrackerService } from './tracker.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Tracker.name, schema: TrackerSchema }, { name: TrackingLog.name, schema: TrackingLogSchema }]),
+    MongooseModule.forFeature([
+      { name: Tracker.name, schema: TrackerSchema },
+      { name: TrackingLog.name, schema: TrackingLogSchema },
+    ]),
     HttpModule,
   ],
   providers: [TrackerResolver, TrackerService],

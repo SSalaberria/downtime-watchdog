@@ -1,7 +1,9 @@
 import { Payload } from '../src/auth';
 
 export declare global {
-  type AnyObject = Record<string, unknown>;
+  interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
+    metadata?: Record<string, any>;
+  }
 
   namespace NodeJS {
     interface ProcessEnv {
@@ -13,6 +15,11 @@ export declare global {
       JWT_SECRET: string;
       JWT_REFRESH_SECRET: string;
       SALT: string;
+
+      SMTP_HOST: string;
+      SMTP_USER: string;
+      SMTP_PASSWORD: string;
+      SMTP_FROM: string;
     }
   }
 
