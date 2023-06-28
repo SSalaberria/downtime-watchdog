@@ -2,6 +2,8 @@ import { memo, useMemo } from "react";
 
 import { Status, TrackingLog } from "~/common/types.generated";
 
+import { formatResponseTime } from "../common";
+
 interface TrackingGraphProps {
   logs: Array<Omit<TrackingLog, "tracker">>;
   showAll?: boolean;
@@ -51,14 +53,6 @@ const LogBar = memo(function LogBar({ logs }: { logs: Array<Omit<TrackingLog, "t
       responseTime,
     };
   }, [logs]);
-
-  const formatResponseTime = (responseTime: number) => {
-    if (responseTime < 1000) {
-      return `${Math.floor(responseTime)} ms`;
-    }
-
-    return `${(responseTime / 1000).toFixed(1)} s`;
-  };
 
   return (
     <div className="group/item relative flex bg-green-200">

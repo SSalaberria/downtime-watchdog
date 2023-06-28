@@ -14,6 +14,8 @@ fragment tracker on Tracker {
   monthlyAvailability {
     uptime
     status
+    responseTime
+    responseTimeStatus
   }
   trackingLogs(sinceDate: $sinceDate) {
     status

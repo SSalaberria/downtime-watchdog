@@ -11,3 +11,9 @@ export enum AvailabilityStatus {
   HIGH = 'HIGH',
   UNKNOWN = 'UNKNOWN',
 }
+
+export enum ResponseTimeStatus {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+}

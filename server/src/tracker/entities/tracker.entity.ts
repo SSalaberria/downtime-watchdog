@@ -7,7 +7,7 @@ import type { HydratedDocument } from 'mongoose';
 
 import { TrackingLog } from './tracking-log.entity';
 import { AVAILABILITY_THRESHOLDS } from '../tracker.consts';
-import { AvailabilityStatus, Status } from '../tracker.interface';
+import { AvailabilityStatus, ResponseTimeStatus, Status } from '../tracker.interface';
 
 export type TrackerDocument = HydratedDocument<Tracker>;
 
@@ -16,13 +16,24 @@ registerEnumType(AvailabilityStatus, {
   description: 'Availability status of the tracker',
 });
 
+registerEnumType(ResponseTimeStatus, {
+  name: 'ResponseTimeStatus',
+  description: 'Response time status of the tracker',
+});
+
 @ObjectType()
 export class Availability {
-  @Field(() => AvailabilityStatus, { description: 'Availability status of the tracker' })
+  @Field(() => AvailabilityStatus, { description: 'Availability status of the tracked website' })
   status!: AvailabilityStatus;
 
-  @Field(() => Number, { description: 'Availability threshold of the tracker' })
+  @Field(() => Number, { description: 'Availability threshold of the tracked website' })
   uptime!: number;
+
+  @Field(() => Number, { description: 'Average response time of the tracked website', nullable: true })
+  responseTime!: number;
+
+  @Field(() => ResponseTimeStatus, { description: 'Response time status of the tracked website', nullable: true })
+  responseTimeStatus!: ResponseTimeStatus;
 }
 
 @ObjectType()
@@ -64,17 +75,54 @@ TrackerSchema.virtual('monthlyAvailability').get(async function (this: TrackerDo
 
   const { trackingLogs } = this;
 
-  if (!trackingLogs.length) return { uptime: 0, status: AvailabilityStatus.UNKNOWN };
+  if (!trackingLogs.length) return { uptime: 0, status: AvailabilityStatus.UNKNOWN, responseTime: null };
 
-  const uptimeLogs = trackingLogs.filter((log) => log.status === Status.UP || log.status === Status.UNKNOWN);
+  const trackedLogs = trackingLogs.reduce<{
+    upLogs: TrackingLog[];
+    downLogs: TrackingLog[];
+    trackedResponseTimes: {
+      total: number;
+      count: number;
+    };
+  }>(
+    (acc, log) => {
+      if (log.status === Status.UP) {
+        acc.upLogs.push(log);
+      }
 
-  const uptime = uptimeLogs.length / trackingLogs.length;
+      if (log.status === Status.DOWN) {
+        acc.downLogs.push(log);
+      }
+
+      if (log.responseTime) {
+        acc.trackedResponseTimes.total += log.responseTime;
+        acc.trackedResponseTimes.count += 1;
+      }
+
+      return acc;
+    },
+    {
+      upLogs: [],
+      downLogs: [],
+      trackedResponseTimes: {
+        total: 0,
+        count: 0,
+      },
+    },
+  );
+
+  const uptime = trackedLogs.upLogs.length / (trackedLogs.upLogs.length + trackedLogs.downLogs.length);
+  const responseTime = trackedLogs.trackedResponseTimes.total / trackedLogs.trackedResponseTimes.count;
 
   const status = uptime < AVAILABILITY_THRESHOLDS.LOW ? AvailabilityStatus.LOW
     : uptime < AVAILABILITY_THRESHOLDS.MEDIUM ? AvailabilityStatus.MEDIUM
       : AvailabilityStatus.HIGH;
 
-  return { uptime, status };
+  const responseTimeStatus = responseTime < 1000 ? ResponseTimeStatus.LOW
+    : responseTime < 3000 ? ResponseTimeStatus.MEDIUM
+      : ResponseTimeStatus.HIGH;
+
+  return { uptime, status, responseTime, responseTimeStatus };
 });
 
 export { TrackerSchema };

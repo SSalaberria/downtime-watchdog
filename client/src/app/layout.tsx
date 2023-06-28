@@ -13,7 +13,7 @@ const inter = Inter({
 export const metadata = {
   title: "Downtime Watchdog",
   description: "Downtime Watchdog - A basic but simple uptime tracker",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [{ rel: "icon", url: "/favicon.png" }],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

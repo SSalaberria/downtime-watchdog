@@ -3,10 +3,11 @@
 import { memo, useState } from "react";
 
 import { ImageWithFallback } from "~/common/ui/ImageWithFallback";
-import { AvailabilityStatus } from "~/common/types.generated";
+import { AvailabilityStatus, ResponseTimeStatus } from "~/common/types.generated";
 import { ExpandIcon, TrashIcon, Dialog } from "~/common/ui";
 
 import { TrackerFragment } from "../gql/documents.generated";
+import { formatResponseTime } from "../common";
 
 import { TrackingGraph } from "./tracking-graph.component";
 
@@ -22,11 +23,24 @@ const AVAILABILITY_COLOR = {
   [AvailabilityStatus.Unknown]: "text-gray-600",
 };
 
+const RESPONSE_TIME_COLOR = {
+  [ResponseTimeStatus.High]: "text-red-500",
+  [ResponseTimeStatus.Low]: "text-green-600",
+  [ResponseTimeStatus.Medium]: "text-yellow-500",
+};
+
+const StatSection = ({ value, label, color }: { value: string; label: string; color: string }) => (
+  <div className="flex flex-col items-center">
+    <span className={`text-2xl font-semibold ${color}`}>{value}</span>
+    <span className="text-xs font-light">{label}</span>
+  </div>
+);
+
 export const TrackerCard = memo(function TrackerCard({ data, onRemove }: TrackerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const title = (
-    <div className="flex items-center gap-2">
+    <div className="mb-2 flex items-center gap-2">
       <ImageWithFallback
         alt={`${data.website} favicon`}
         fallbackSrc="/images/loading.svg"
@@ -42,13 +56,25 @@ export const TrackerCard = memo(function TrackerCard({ data, onRemove }: Tracker
     <>
       <div className="relative flex h-60 flex-col rounded-lg border border-accent-1 bg-background-secondary p-6">
         {title}
-        <div className="mt-2 flex flex-col items-center">
-          <span
-            className={`text-2xl font-semibold ${
-              AVAILABILITY_COLOR[data.monthlyAvailability.status]
-            }`}
-          >{`${(data.monthlyAvailability.uptime * 100).toFixed(1)} %`}</span>
-          <span className="text-xs font-light">Monthly availability</span>
+        <div className="flex justify-center gap-2">
+          <StatSection
+            color={AVAILABILITY_COLOR[data.monthlyAvailability.status]}
+            label="Monthly availability"
+            value={`${(data.monthlyAvailability.uptime * 100).toFixed(1)} %`}
+          />
+          <StatSection
+            color={
+              RESPONSE_TIME_COLOR[
+                data.monthlyAvailability.responseTimeStatus || ResponseTimeStatus.High
+              ]
+            }
+            label="Avg. response time"
+            value={
+              data.monthlyAvailability.responseTime
+                ? formatResponseTime(data.monthlyAvailability.responseTime)
+                : "-"
+            }
+          />
         </div>
         <div className="mt-auto flex w-full items-center">
           {data.trackingLogs.length === 0 ? (
