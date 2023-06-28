@@ -48,7 +48,9 @@ export const TrackerCard = memo(function TrackerCard({ data, onRemove }: Tracker
         src={`https://www.google.com/s2/favicons?domain=${data.website}&sz=32`}
         width={32}
       />
-      <h4 className=" font-semibold text-white">{data.website}</h4>
+      <a className=" font-semibold text-white" href={data.website} target="_blank">
+        {data.website}
+      </a>
     </div>
   );
 

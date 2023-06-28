@@ -120,7 +120,7 @@ export function TrackingGraph({ logs, showAll }: TrackingGraphProps) {
   }, [logs]);
 
   return (
-    <div className="flex w-full gap-0.5">
+    <div className="flex w-full justify-center gap-0.5">
       {logsByDate.map((col) => (
         <div key={col.date} className="group/column flex ">
           <div className="flex w-2 flex-col-reverse gap-0.5">
