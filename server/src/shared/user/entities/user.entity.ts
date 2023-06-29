@@ -25,6 +25,10 @@ export class User {
   @HideField()
   password!: string;
 
+  @Prop({ required: true, default: false })
+  @HideField()
+  verified!: boolean;
+
   @Prop({ required: false, default: [] })
   @Field(() => [String], { description: 'Roles' })
   roles!: Role[];

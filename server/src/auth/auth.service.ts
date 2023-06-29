@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcrypt';
 
-import type { JwtPayload, JwtSign, Payload } from './auth.interface';
+import type { JwtPayload, JwtSign, Payload, VerificationPayload } from './auth.interface';
 import { CreateUserInput, UserDocument, UserService } from '../shared/user';
 
 @Injectable()
@@ -33,6 +33,16 @@ export class AuthService {
     return payload.sub === data.id;
   }
 
+  public async verifyMail(token: string): Promise<boolean> {
+    const payload = this.jwt.decode(token) as VerificationPayload;
+    const user = await this.user.findOne(payload.email);
+
+    user.verified = true;
+    await user.save();
+
+    return true;
+  }
+
   public jwtSign(data: Payload): JwtSign {
     const payload: JwtPayload = { sub: data.id, name: data.name, roles: data.roles, email: data.email };
 
@@ -40,6 +50,11 @@ export class AuthService {
       access_token: this.jwt.sign(payload),
       refresh_token: this.getRefreshToken(payload.sub),
     };
+  }
+
+  public signMail(email: string): string {
+    const payload: VerificationPayload = { email };
+    return this.jwt.sign(payload);
   }
 
   public hashPassword(password: string): string {

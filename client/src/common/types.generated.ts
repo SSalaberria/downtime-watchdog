@@ -100,6 +100,7 @@ export type Mutation = {
   removeTracker: Tracker;
   removeTrackerFromDashboard: Dashboard;
   updateUser: User;
+  verifyMail: Scalars['Boolean']['output'];
 };
 
 
@@ -145,6 +146,11 @@ export type MutationRemoveTrackerFromDashboardArgs = {
 
 export type MutationUpdateUserArgs = {
   updateUserInput: UpdateUserInput;
+};
+
+
+export type MutationVerifyMailArgs = {
+  verifyMailInput: VerifyMailInput;
 };
 
 export type PageDataDto = {
@@ -285,4 +291,8 @@ export type UsersResponse = {
   __typename?: 'UsersResponse';
   page: UserConnection;
   pageData?: Maybe<PageDataDto>;
+};
+
+export type VerifyMailInput = {
+  token: Scalars['String']['input'];
 };

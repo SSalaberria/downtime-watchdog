@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
+import toast from "react-hot-toast";
 
 import { CopyIcon } from "~/common/ui";
 import { Dashboard, TrackerInput } from "~/features/dashboard";
@@ -14,11 +15,13 @@ export function UserDashboard({}) {
 
     navigator.clipboard.writeText(`${url}/${data?.userDashboard._id}`);
 
-    alert("Copied link to this dashboard!");
+    toast("Copied link to this dashboard!", {
+      icon: "📋",
+    });
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-2">
       <div className="flex">
         <TrackerInput className=" w-full sm:w-72" disabled={loading} />
         <button

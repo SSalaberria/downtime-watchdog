@@ -20,7 +20,7 @@ import { MailService } from './mail.service';
           },
         },
         defaults: {
-          from: `"No Reply" <${config.get('smtp.from')}>`,
+          from: `"Downtime watchdog" <${config.get('smtp.from')}>`,
         },
         template: {
           dir: join(__dirname, 'templates'),

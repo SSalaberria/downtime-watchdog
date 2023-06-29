@@ -24,3 +24,11 @@ mutation Register($email: String!, $password: String!, $name: String!) {
     access_token
   }
 }
+
+mutation VerifyMail($token: String!) {
+  verifyMail(
+    verifyMailInput: {
+      token: $token
+    }
+  )
+}

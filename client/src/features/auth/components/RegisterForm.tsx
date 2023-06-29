@@ -4,11 +4,12 @@ import { useMutation } from "@apollo/client";
 import { useCallback } from "react";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 import { Button } from "~/common/ui/button";
 import { TOKEN_KEY } from "~/common";
 
-import { LoginDocument, RegisterDocument } from "../gql/documents.generated";
+import { RegisterDocument } from "../gql/documents.generated";
 
 export function RegisterForm() {
   const { push } = useRouter();
@@ -16,6 +17,10 @@ export function RegisterForm() {
   const [register, { loading, error }] = useMutation(RegisterDocument, {
     onCompleted(data) {
       setCookie(TOKEN_KEY, data.register.access_token, { path: "/" });
+
+      toast("An email has been sent to your address, please verify it to enable notifications.", {
+        icon: "📧",
+      });
 
       push("/dashboard");
     },

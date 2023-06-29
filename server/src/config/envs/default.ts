@@ -25,6 +25,7 @@ export const config = {
     password: process.env.SMTP_PASSWORD,
     from: process.env.SMTP_FROM,
   },
+  emailConfirmationUrl: process.env.EMAIL_CONFIRMATION_URL,
   jwtSecret: process.env.JWT_SECRET,
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
 };

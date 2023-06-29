@@ -10,6 +10,10 @@ export interface JwtPayload {
   roles: string[];
 }
 
+export interface VerificationPayload {
+  email: string;
+}
+
 export interface Payload {
   id: string;
   name: string;

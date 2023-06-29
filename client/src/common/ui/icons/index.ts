@@ -7,3 +7,5 @@ export * from "./loading-icon";
 export * from "./expand-icon";
 
 export * from "./copy-icon";
+
+export * from "./logout-icon";

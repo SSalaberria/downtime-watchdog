@@ -20,6 +20,8 @@ export declare global {
       SMTP_USER: string;
       SMTP_PASSWORD: string;
       SMTP_FROM: string;
+
+      EMAIL_CONFIRMATION_URL: string;
     }
   }
 
