@@ -1,0 +1,6 @@
+query GetUserData {
+  user {
+    email
+    name
+  }
+}

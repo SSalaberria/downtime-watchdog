@@ -1,28 +1,13 @@
 "use client";
 
-import { useMutation } from "@apollo/client";
 import { useCallback } from "react";
-import { useCookies } from "react-cookie";
-import { useRouter } from "next/navigation";
 
 import { Button } from "~/common/ui/button";
-import { TOKEN_KEY } from "~/common";
 
-import { LoginDocument } from "../gql/documents.generated";
+import { useAuth } from "../hooks";
 
 export function LoginForm() {
-  const { push } = useRouter();
-  const [, setCookie] = useCookies([TOKEN_KEY]);
-  const [login, { loading, error }] = useMutation(LoginDocument, {
-    onCompleted(data) {
-      setCookie(TOKEN_KEY, data.login.access_token, { path: "/" });
-
-      push("/dashboard");
-    },
-    onError(error) {
-      console.error(error);
-    },
-  });
+  const [login, { loading, error }] = useAuth().LoginMutation;
 
   const formFields = [
     { id: "email", label: "Email", type: "email" },
@@ -32,8 +17,6 @@ export function LoginForm() {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-
-      console.log("wtf");
 
       const { email, password } = e.target as typeof e.target & {
         email: { value: string };

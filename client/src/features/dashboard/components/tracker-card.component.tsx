@@ -2,9 +2,8 @@
 
 import { memo, useState } from "react";
 
-import { ImageWithFallback } from "~/common/ui/ImageWithFallback";
 import { AvailabilityStatus, ResponseTimeStatus } from "~/common/types.generated";
-import { ExpandIcon, TrashIcon, Dialog } from "~/common/ui";
+import { ExpandIcon, TrashIcon, Dialog, ImageWithFallback } from "~/common/ui";
 
 import { TrackerFragment } from "../gql/documents.generated";
 import { formatResponseTime } from "../common";

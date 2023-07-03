@@ -21,6 +21,7 @@ export default {
         },
         accent: {
           1: "var(--accent-1)",
+          2: "var(--accent-2)",
         },
       },
     },

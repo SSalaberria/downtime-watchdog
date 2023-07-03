@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 
 import { Dialog } from "~/common/ui";
 
-import { LoginForm } from "./LoginForm";
-import { RegisterForm } from "./RegisterForm";
+import { LoginForm } from "./login-form.component";
+import { RegisterForm } from "./register-form.component";
 
 interface AuthDialogProps {
   onClose: () => void;

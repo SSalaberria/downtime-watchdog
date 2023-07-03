@@ -17,6 +17,7 @@ export function UserDashboard({}) {
 
     toast("Copied link to this dashboard!", {
       icon: "📋",
+      duration: 5000,
     });
   };
 

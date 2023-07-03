@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCookies } from "react-cookie";
 
 import { Button } from "~/common/ui";
-import { AuthDialog } from "~/features/auth/components/AuthDialog";
+import { AuthDialog } from "~/features/auth";
 
 export function CreateDashboardCTA() {
   const { push } = useRouter();
