@@ -1,3 +1,5 @@
+"use client";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
 interface DialogProps {
@@ -6,6 +8,20 @@ interface DialogProps {
 }
 
 export const Dialog = ({ children, onClose }: DialogProps) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
   return createPortal(
     <dialog
       open
@@ -15,7 +31,7 @@ export const Dialog = ({ children, onClose }: DialogProps) => {
       onClick={() => onClose()}
     >
       <div
-        className="relative z-40 flex flex-col gap-4 rounded-xl bg-background-primary p-6"
+        className="absolute inset-0 z-40 flex flex-col gap-4 overflow-y-auto overflow-x-hidden rounded-xl bg-background-primary p-6 md:relative md:overflow-y-hidden"
         onClick={(e) => {
           e?.stopPropagation();
         }}

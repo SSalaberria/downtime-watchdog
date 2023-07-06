@@ -24,6 +24,7 @@ export function useAuth() {
 
       toast("An email has been sent to your address, please verify it to enable notifications.", {
         icon: "📧",
+        duration: 6000,
       });
     },
     onError(error) {

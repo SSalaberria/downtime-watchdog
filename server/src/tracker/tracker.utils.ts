@@ -24,6 +24,7 @@ export function getUnknownLogs(lastLog: TrackingLog | null): TrackingLog[] {
       _id: new mongoose.Types.ObjectId(),
       tracker: lastLog.tracker,
       responseTime: null,
+      response: null,
     });
 
     // Move to the next 10-minute interval

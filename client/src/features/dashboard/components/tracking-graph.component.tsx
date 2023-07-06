@@ -5,7 +5,10 @@ import { Status, TrackingLog } from "~/common/types.generated";
 import { formatResponseTime } from "../common";
 
 interface TrackingGraphProps {
-  logs: Array<Omit<TrackingLog, "tracker">>;
+  logsByDate: {
+    date: string;
+    logs: Record<number, Omit<TrackingLog, "tracker">[]>;
+  }[];
   showAll?: boolean;
 }
 
@@ -82,43 +85,7 @@ const LogBar = memo(function LogBar({ logs }: { logs: Array<Omit<TrackingLog, "t
   );
 });
 
-export function TrackingGraph({ logs, showAll }: TrackingGraphProps) {
-  const logsByDate = useMemo(() => {
-    const dates: Array<string> = [];
-    const date = new Date();
-
-    for (let i = 0; i < 30; i++) {
-      dates.push(date.toISOString());
-
-      date.setDate(date.getDate() - 1);
-    }
-
-    return dates
-      .map((date) => ({
-        date,
-        logs: (() => {
-          const filteredLogs = logs.filter(
-            (log) => log.createdAt.substring(0, 10) === date.substring(0, 10),
-          );
-
-          const logsByHour = filteredLogs.reduce((acc, log) => {
-            const hour = new Date(log.createdAt).getUTCHours();
-
-            if (!acc[hour]) {
-              acc[hour] = [];
-            }
-
-            acc[hour]!.push(log);
-
-            return acc;
-          }, {} as Record<number, Array<Omit<TrackingLog, "tracker">>>);
-
-          return logsByHour;
-        })(),
-      }))
-      .reverse();
-  }, [logs]);
-
+export function TrackingGraph({ logsByDate, showAll }: TrackingGraphProps) {
   return (
     <div className="flex w-full justify-center gap-0.5">
       {logsByDate.map((col) => (

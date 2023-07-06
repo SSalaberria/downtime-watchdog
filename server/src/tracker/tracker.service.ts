@@ -60,12 +60,18 @@ export class TrackerService implements OnApplicationBootstrap, OnModuleDestroy {
 
       this.httpService.get(website).subscribe({
         next: (res) => {
-          const { responseTime } = res as AxiosResponse & { responseTime: number };
+          const { responseTime, statusText } = res as AxiosResponse & { responseTime: number };
 
-          void this.trackingLogModel.create({ tracker: trackerId, status: Status.UP, responseTime, createdAt });
+          void this.trackingLogModel.create({ tracker: trackerId, status: Status.UP, responseTime, createdAt, response: statusText });
         },
-        error: ({ responseTime }) => {
-          void this.trackingLogModel.create({ tracker: trackerId, status: Status.DOWN, responseTime, createdAt });
+        error: ({ responseTime, code }) => {
+          void this.trackingLogModel.create({
+            tracker: trackerId,
+            status: Status.DOWN,
+            responseTime,
+            createdAt,
+            response: code,
+          });
 
           this.eventEmitter.emit(TrackedErrorEvent.name, new TrackedErrorEvent(trackerId, tracker.website));
         },

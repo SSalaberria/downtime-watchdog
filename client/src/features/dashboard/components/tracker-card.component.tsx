@@ -1,14 +1,16 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
-import { AvailabilityStatus, ResponseTimeStatus } from "~/common/types.generated";
+import { AvailabilityStatus, ResponseTimeStatus, TrackingLog } from "~/common/types.generated";
 import { ExpandIcon, TrashIcon, Dialog, ImageWithFallback } from "~/common/ui";
 
 import { TrackerFragment } from "../gql/documents.generated";
 import { formatResponseTime } from "../common";
 
 import { TrackingGraph } from "./tracking-graph.component";
+import { AvailabilityChart } from "./availability-chart.component";
+import { LatencyChart } from "./latency-chart.component";
 
 interface TrackerProps {
   data: TrackerFragment;
@@ -28,15 +30,51 @@ const RESPONSE_TIME_COLOR = {
   [ResponseTimeStatus.Medium]: "text-yellow-500",
 };
 
-const StatSection = ({ value, label, color }: { value: string; label: string; color: string }) => (
+const StatSection = ({ value, label, color }: { value: string; label?: string; color: string }) => (
   <div className="flex flex-col items-center">
     <span className={`text-2xl font-semibold ${color}`}>{value}</span>
-    <span className="text-xs font-light">{label}</span>
+    {label && <span className="text-xs font-light">{label}</span>}
   </div>
 );
 
 export const TrackerCard = memo(function TrackerCard({ data, onRemove }: TrackerProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const logsByDate = useMemo(() => {
+    const dates: Array<string> = [];
+    const date = new Date();
+
+    for (let i = 0; i < 30; i++) {
+      dates.push(date.toISOString());
+
+      date.setDate(date.getDate() - 1);
+    }
+
+    return dates
+      .map((date) => ({
+        date,
+        logs: (() => {
+          const filteredLogs = data.trackingLogs.filter(
+            (log) => log.createdAt.substring(0, 10) === date.substring(0, 10),
+          );
+
+          const logsByHour = filteredLogs.reduce((acc, log) => {
+            const hour = new Date(log.createdAt).getUTCHours();
+
+            if (!acc[hour]) {
+              acc[hour] = [];
+            }
+
+            acc[hour]!.push(log);
+
+            return acc;
+          }, {} as Record<number, Array<Omit<TrackingLog, "tracker">>>);
+
+          return logsByHour;
+        })(),
+      }))
+      .reverse();
+  }, [data.trackingLogs]);
 
   const title = (
     <div className="mb-2 flex items-center gap-2">
@@ -69,7 +107,7 @@ export const TrackerCard = memo(function TrackerCard({ data, onRemove }: Tracker
                 data.monthlyAvailability.responseTimeStatus || ResponseTimeStatus.High
               ]
             }
-            label="Avg. response time"
+            label="Avg. latency"
             value={
               data.monthlyAvailability.responseTime
                 ? formatResponseTime(data.monthlyAvailability.responseTime)
@@ -81,7 +119,7 @@ export const TrackerCard = memo(function TrackerCard({ data, onRemove }: Tracker
           {data.trackingLogs.length === 0 ? (
             <p className="mx-auto text-center text-gray-500">Not tracked yet.</p>
           ) : (
-            <TrackingGraph logs={data.trackingLogs} />
+            <TrackingGraph logsByDate={logsByDate} />
           )}
         </div>
 
@@ -99,7 +137,41 @@ export const TrackerCard = memo(function TrackerCard({ data, onRemove }: Tracker
       {isOpen && (
         <Dialog onClose={() => setIsOpen(false)}>
           <div className=" self-center">{title}</div>
-          <TrackingGraph logs={data.trackingLogs} showAll={true} />
+          <div className="flex w-full flex-col-reverse items-center gap-4 md:flex-row">
+            <TrackingGraph logsByDate={logsByDate} showAll={true} />
+            <div className="flex w-full flex-col gap-4">
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between">
+                  <h4 className=" text-lg">Availability</h4>
+                  <StatSection
+                    color={AVAILABILITY_COLOR[data.monthlyAvailability.status]}
+                    label="Monthly"
+                    value={`${(data.monthlyAvailability.uptime * 100).toFixed(1)} %`}
+                  />
+                </div>
+                <AvailabilityChart logs={data.trackingLogs} />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between">
+                  <h4 className=" text-lg">Latency</h4>
+                  <StatSection
+                    color={
+                      RESPONSE_TIME_COLOR[
+                        data.monthlyAvailability.responseTimeStatus || ResponseTimeStatus.High
+                      ]
+                    }
+                    label="Average"
+                    value={
+                      data.monthlyAvailability.responseTime
+                        ? formatResponseTime(data.monthlyAvailability.responseTime)
+                        : "-"
+                    }
+                  />
+                </div>
+                <LatencyChart logsByDate={logsByDate} />
+              </div>
+            </div>
+          </div>
         </Dialog>
       )}
     </>

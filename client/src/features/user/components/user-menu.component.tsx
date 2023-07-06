@@ -50,11 +50,11 @@ const UserMenu = memo(function UserMenu() {
 
       {isOpen && (
         <div className="absolute right-0 z-20 mt-2 rounded-md bg-accent-1 shadow-lg">
-          <ul className="">
+          <ul className=" ">
             {menuOptions.map((option) => (
               <li
                 key={option.label}
-                className="cursor-pointer px-4 py-2 hover:bg-accent-2"
+                className="flex w-max min-w-full cursor-pointer px-4 py-2 hover:bg-accent-2 first:hover:rounded-t-md last:hover:rounded-b-md "
                 onClick={() => {
                   option.onClick();
                   setOpen(false);

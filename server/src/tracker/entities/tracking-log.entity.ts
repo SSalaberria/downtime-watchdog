@@ -33,6 +33,10 @@ export class TrackingLog {
   @Prop({ required: false, default: null, type: Number })
   @Field(() => Number, { description: 'Response time', nullable: true })
   responseTime!: number | null;
+
+  @Prop({ required: false, default: null, type: String })
+  @Field(() => String, { description: 'Response message', nullable: true })
+  response!: string | null;
 }
 
 const TrackingLogSchema = SchemaFactory.createForClass(TrackingLog);

@@ -4,6 +4,8 @@ import { getClient } from "~/lib/apollo";
 
 export const dynamic = "force-dynamic";
 
+// export const revalidate = 300; // 5 min caching after a request is received
+
 export default async function HomePage() {
   const { data, error } = await getClient().query({
     query: GetDashboardDocument,
