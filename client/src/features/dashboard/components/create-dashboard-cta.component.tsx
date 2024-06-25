@@ -6,7 +6,11 @@ import { useCookies } from "react-cookie";
 import { Button } from "~/common/ui";
 import { AuthDialog } from "~/features/auth";
 
-export function CreateDashboardCTA() {
+interface CreateDashboardCTAProps {
+  label: string;
+}
+
+export function CreateDashboardCTA({ label }: CreateDashboardCTAProps) {
   const { push } = useRouter();
   const [cookies] = useCookies(["token"]);
   const [openAuthDialog, setOpenAuthDialog] = useState(false);
@@ -24,7 +28,7 @@ export function CreateDashboardCTA() {
   return (
     <>
       <Button className="w-68 px-8 text-lg " variant="secondary" onClick={handleAction}>
-        Build your dashboard
+        {label}
       </Button>
       {openAuthDialog && <AuthDialog onClose={() => setOpenAuthDialog(false)} />}
     </>

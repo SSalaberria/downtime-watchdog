@@ -14,13 +14,33 @@ fragment tracker on Tracker {
   monthlyAvailability {
     uptime
     status
-    responseTime
-    responseTimeStatus
+    latency {
+      average
+      averageStatus
+      minStatus
+      maxStatus
+      min {
+        responseTime
+        createdAt
+      }
+      max {
+        responseTime
+        createdAt
+      }
+    }
+    responses {
+      total
+      responseFrequencies {
+        count
+        response
+      }
+    }
   }
   trackingLogs(sinceDate: $sinceDate) {
     status
     _id
     createdAt
+    response
     responseTime
   }
 }
@@ -34,6 +54,12 @@ query GetUserDashboard($sinceDate: DateTime = null){
 query GetDashboard($_id: String = null, $sinceDate: DateTime = null){
   dashboard(_id: $_id) {
     ...dashboard
+  }
+}
+
+query GetTracker($_id: String!, $sinceDate: DateTime = null) {
+  tracker(_id: $_id) {
+    ...tracker
   }
 }
 

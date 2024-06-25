@@ -21,7 +21,11 @@
   textarea {
     @apply bg-background-secondary border border-accent-1 active:border-accent-1 rounded-lg transition-colors duration-200 p-2 text-gray-200 shadow placeholder:text-gray-500
   }
-  
+  .card {
+    @apply rounded-lg border border-accent-1 bg-background-secondary
+  }
+
+
 }
 
 body::-webkit-scrollbar {

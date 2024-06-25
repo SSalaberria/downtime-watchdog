@@ -37,8 +37,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           />
-          <div className="flex min-h-screen bg-background-primary">
-            <div className="mx-auto w-full max-w-7xl overflow-hidden px-6 py-4">{children}</div>
+          <div
+            className="flex min-h-[calc(100vh-5rem)] bg-background-primary"
+            style={{
+              backgroundImage: "url('/images/line.svg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <div className="mx-auto w-full max-w-7xl overflow-hidden px-6">{children}</div>
             <div id="portal-root" />
           </div>
         </ApolloWrapper>

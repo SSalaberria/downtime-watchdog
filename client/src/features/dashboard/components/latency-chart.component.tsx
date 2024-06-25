@@ -1,3 +1,5 @@
+"use client";
+
 import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
@@ -96,7 +98,7 @@ export function LatencyChart({ logsByDate }: LatencyChartProps) {
         options={options}
         series={[
           {
-            name: "Response time",
+            name: "Avg. response time",
             data: dailyAvgLatency.map((log) => log.responseTime),
           },
         ]}

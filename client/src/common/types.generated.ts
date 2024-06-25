@@ -22,10 +22,10 @@ export type AddTrackerInput = {
 
 export type Availability = {
   __typename?: 'Availability';
-  /** Average response time of the tracked website */
-  responseTime?: Maybe<Scalars['Float']['output']>;
-  /** Response time status of the tracked website */
-  responseTimeStatus?: Maybe<ResponseTimeStatus>;
+  /** Latency of the tracked website */
+  latency: Latency;
+  /** Response frequencies of the tracked website */
+  responses: Responses;
   /** Availability status of the tracked website */
   status: AvailabilityStatus;
   /** Availability threshold of the tracked website */
@@ -72,6 +72,22 @@ export type Dashboard = {
   owner: User;
   /** Trackers on dashboard */
   trackers: Array<Tracker>;
+};
+
+export type Latency = {
+  __typename?: 'Latency';
+  /** Average response time of the tracked website */
+  average?: Maybe<Scalars['Float']['output']>;
+  /** Response time status of the tracked website */
+  averageStatus?: Maybe<ResponseTimeStatus>;
+  /** Tracking log with the maximum response time of the tracked website */
+  max?: Maybe<TrackingLog>;
+  /** Max. Response time status of the tracked website */
+  maxStatus?: Maybe<ResponseTimeStatus>;
+  /** Tracker log with the minimum response time of the tracked website */
+  min?: Maybe<TrackingLog>;
+  /** Min. Response time status of the tracked website */
+  minStatus?: Maybe<ResponseTimeStatus>;
 };
 
 export type LoggedUserOutput = {
@@ -199,12 +215,28 @@ export type RemoveTrackerInput = {
   trackerId: Scalars['String']['input'];
 };
 
+export type ResponseFrequency = {
+  __typename?: 'ResponseFrequency';
+  /** Number of logs with given response */
+  count: Scalars['Float']['output'];
+  /** Response of the logged request */
+  response: Scalars['String']['output'];
+};
+
 /** Response time status of the tracker */
 export enum ResponseTimeStatus {
   High = 'HIGH',
   Low = 'LOW',
   Medium = 'MEDIUM'
 }
+
+export type Responses = {
+  __typename?: 'Responses';
+  /** Response frequencies of the tracked website */
+  responseFrequencies: Array<ResponseFrequency>;
+  /** Total count of responses */
+  total: Scalars['Float']['output'];
+};
 
 /** Status of the tracker */
 export enum Status {
@@ -237,6 +269,8 @@ export type TrackingLog = {
   _id: Scalars['String']['output'];
   /** Date of the tracking log */
   createdAt: Scalars['DateTime']['output'];
+  /** Response message */
+  response?: Maybe<Scalars['String']['output']>;
   /** Response time */
   responseTime?: Maybe<Scalars['Float']['output']>;
   /** Registered status */

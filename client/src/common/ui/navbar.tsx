@@ -9,10 +9,10 @@ const DynamicUserMenu = dynamic(() => import("~/features/user/components/user-me
 
 export function Navbar() {
   return (
-    <nav className="flex h-24 items-center justify-between px-4 py-6">
+    <nav className="flex h-20 items-center justify-between px-4 py-6">
       <Link className="flex items-center gap-2" href="/">
         <Image alt="logo" height={32} src="/images/logo.png" width={32} />{" "}
-        <span>Downtime Watchdog</span>
+        <span className="text-primary">Downtime Watchdog</span>
       </Link>
       <div>
         <DynamicUserMenu />

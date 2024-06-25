@@ -38,6 +38,6 @@
     "project": "./tsconfig.json",
     "tsconfigRootDir": "__dirname"
   },
-  "include": ["typings/global.d.ts", "src/**/*", "test/**/*", "bin/**/*"],
+  "include": ["typings/global.d.ts", "src/**/*", "test/**/*", "bin/**/*", "migrations/**/*", ".eslintrc.js"],
   "exclude": ["node_modules"]
 }

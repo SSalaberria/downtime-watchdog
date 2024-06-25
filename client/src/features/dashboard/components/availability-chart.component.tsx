@@ -24,15 +24,7 @@ export const AvailabilityChart = memo(function AvailabilityChart({ logs }: Avail
   const filteredLogsCount = useMemo(() => {
     return logs.reduce(
       (acc, log) => {
-        if (log.status === Status.Up) {
-          acc[Status.Up] += 1;
-        }
-        if (log.status === Status.Down) {
-          acc[Status.Down] += 1;
-        }
-        if (log.status === Status.Unknown) {
-          acc[Status.Unknown] += 1;
-        }
+        acc[log.status] += 1;
 
         return acc;
       },
@@ -40,6 +32,7 @@ export const AvailabilityChart = memo(function AvailabilityChart({ logs }: Avail
         [Status.Up]: 0,
         [Status.Down]: 0,
         [Status.Unknown]: 0,
+        [Status.Untracked]: 0,
       },
     );
   }, [logs]);
@@ -50,23 +43,25 @@ export const AvailabilityChart = memo(function AvailabilityChart({ logs }: Avail
     },
     dataLabels: {
       enabled: true,
+      style: {
+        fontFamily: "inherit",
+      },
     },
     plotOptions: {
       pie: {
         expandOnClick: false,
+
         donut: {
           labels: {
             show: true,
-            total: {
-              color: "pink",
-            },
             value: {
-              color: "var(--font)",
+              show: false,
             },
             name: {
               formatter(val) {
                 return val.charAt(0) + val.toLowerCase().slice(1);
               },
+              fontFamily: "inherit",
             },
           },
         },
@@ -78,7 +73,7 @@ export const AvailabilityChart = memo(function AvailabilityChart({ logs }: Avail
         color: "white",
       },
     },
-    labels: [Status.Up, Status.Down, "Untracked"],
+    labels: ["Online", "Offline", "Unknown", "Untracked"],
     colors: ["#16A34A", "#EF4444", "#6B7280"],
     stroke: {
       show: false,
@@ -88,6 +83,13 @@ export const AvailabilityChart = memo(function AvailabilityChart({ logs }: Avail
     },
     tooltip: {
       enabled: false,
+    },
+    states: {
+      active: {
+        filter: {
+          type: "none",
+        },
+      },
     },
   };
 

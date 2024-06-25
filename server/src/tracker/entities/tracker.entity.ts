@@ -7,7 +7,8 @@ import type { HydratedDocument } from 'mongoose';
 
 import { TrackingLog } from './tracking-log.entity';
 import { AVAILABILITY_THRESHOLDS } from '../tracker.consts';
-import { AvailabilityStatus, ResponseTimeStatus, Status } from '../tracker.interface';
+import { AvailabilityStatus, ResponseTimeStatus } from '../tracker.interface';
+import { getResponseTimeStatus, processLogs } from '../tracker.utils';
 
 export type TrackerDocument = HydratedDocument<Tracker>;
 
@@ -22,6 +23,45 @@ registerEnumType(ResponseTimeStatus, {
 });
 
 @ObjectType()
+export class Latency {
+  @Field(() => Number, { description: 'Average response time of the tracked website', nullable: true })
+  average!: number;
+
+  @Field(() => ResponseTimeStatus, { description: 'Response time status of the tracked website', nullable: true })
+  averageStatus!: ResponseTimeStatus;
+
+  @Field(() => TrackingLog, { description: 'Tracker log with the minimum response time of the tracked website', nullable: true })
+  min!: TrackingLog | null;
+
+  @Field(() => ResponseTimeStatus, { description: 'Min. Response time status of the tracked website', nullable: true })
+  minStatus!: ResponseTimeStatus;
+
+  @Field(() => TrackingLog, { description: 'Tracking log with the maximum response time of the tracked website', nullable: true })
+  max!: TrackingLog | null;
+
+  @Field(() => ResponseTimeStatus, { description: 'Max. Response time status of the tracked website', nullable: true })
+  maxStatus!: ResponseTimeStatus;
+}
+
+@ObjectType()
+export class ResponseFrequency {
+  @Field(() => Number, { description: 'Number of logs with given response' })
+  count!: number;
+
+  @Field(() => String, { description: 'Response of the logged request' })
+  response!: string;
+}
+
+@ObjectType()
+export class Responses {
+  @Field(() => Number, { description: 'Total count of responses' })
+  total!: number;
+
+  @Field(() => [ResponseFrequency], { description: 'Response frequencies of the tracked website' })
+  responseFrequencies!: ResponseFrequency[];
+}
+
+@ObjectType()
 export class Availability {
   @Field(() => AvailabilityStatus, { description: 'Availability status of the tracked website' })
   status!: AvailabilityStatus;
@@ -29,11 +69,11 @@ export class Availability {
   @Field(() => Number, { description: 'Availability threshold of the tracked website' })
   uptime!: number;
 
-  @Field(() => Number, { description: 'Average response time of the tracked website', nullable: true })
-  responseTime!: number;
+  @Field(() => Latency, { description: 'Latency of the tracked website' })
+  latency!: Latency;
 
-  @Field(() => ResponseTimeStatus, { description: 'Response time status of the tracked website', nullable: true })
-  responseTimeStatus!: ResponseTimeStatus;
+  @Field(() => Responses, { description: 'Response frequencies of the tracked website' })
+  responses!: Responses;
 }
 
 @ObjectType()
@@ -77,52 +117,34 @@ TrackerSchema.virtual('monthlyAvailability').get(async function (this: TrackerDo
 
   if (!trackingLogs.length) return { uptime: 0, status: AvailabilityStatus.UNKNOWN, responseTime: null };
 
-  const trackedLogs = trackingLogs.reduce<{
-    upLogs: TrackingLog[];
-    downLogs: TrackingLog[];
-    trackedResponseTimes: {
-      total: number;
-      count: number;
-    };
-  }>(
-    (acc, log) => {
-      if (log.status === Status.UP) {
-        acc.upLogs.push(log);
-      }
+  const processedData = processLogs(trackingLogs);
 
-      if (log.status === Status.DOWN) {
-        acc.downLogs.push(log);
-      }
+  const uptime = processedData.upLogs.length / (processedData.upLogs.length + processedData.downLogs.length);
+  const responseTime = processedData.trackedResponseTimes.total / processedData.trackedResponseTimes.count;
 
-      if (log.responseTime) {
-        acc.trackedResponseTimes.total += log.responseTime;
-        acc.trackedResponseTimes.count += 1;
-      }
-
-      return acc;
-    },
-    {
-      upLogs: [],
-      downLogs: [],
-      trackedResponseTimes: {
-        total: 0,
-        count: 0,
-      },
-    },
-  );
-
-  const uptime = trackedLogs.upLogs.length / (trackedLogs.upLogs.length + trackedLogs.downLogs.length);
-  const responseTime = trackedLogs.trackedResponseTimes.total / trackedLogs.trackedResponseTimes.count;
-
-  const status = uptime < AVAILABILITY_THRESHOLDS.LOW ? AvailabilityStatus.LOW
-    : uptime < AVAILABILITY_THRESHOLDS.MEDIUM ? AvailabilityStatus.MEDIUM
+  const status = uptime < AVAILABILITY_THRESHOLDS.LOW
+    ? AvailabilityStatus.LOW
+    : uptime < AVAILABILITY_THRESHOLDS.MEDIUM
+      ? AvailabilityStatus.MEDIUM
       : AvailabilityStatus.HIGH;
 
-  const responseTimeStatus = responseTime < 1000 ? ResponseTimeStatus.LOW
-    : responseTime < 3000 ? ResponseTimeStatus.MEDIUM
-      : ResponseTimeStatus.HIGH;
+  const latency = {
+    average: responseTime,
+    averageStatus: getResponseTimeStatus(responseTime),
+    min: processedData.trackedResponseTimes.min,
+    minStatus: getResponseTimeStatus(processedData.trackedResponseTimes.min?.responseTime ?? 0),
+    max: processedData.trackedResponseTimes.max,
+    maxStatus: getResponseTimeStatus(processedData.trackedResponseTimes.max?.responseTime ?? 0),
+  };
 
-  return { uptime, status, responseTime, responseTimeStatus };
+  const responses = {
+    total: Object.values(processedData.responses).reduce((acc, curr) => acc + curr, 0),
+    responseFrequencies: Object.entries(processedData.responses)
+      .map(([response, count]) => ({ response, count }))
+      .sort((a, b) => b.count - a.count),
+  };
+
+  return { uptime, status, responseTime, latency, responses };
 });
 
 export { TrackerSchema };

@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback } from "react";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import {
   DashboardFragment,
+  GetDashboardDocument,
   GetUserDashboardDocument,
   RemoveTrackerDocument,
 } from "../gql/documents.generated";
@@ -15,9 +16,10 @@ interface DashboardProps {
   data: DashboardFragment | undefined;
   showActions?: boolean;
   loading?: boolean;
+  stacked?: boolean;
 }
 
-export function Dashboard({ data, showActions, loading }: DashboardProps) {
+export function Dashboard({ data, showActions, loading, stacked }: DashboardProps) {
   const [removeTracker] = useMutation(RemoveTrackerDocument, {
     update(cache, { data }) {
       cache.updateQuery({ query: GetUserDashboardDocument }, (cacheData: any) => {
@@ -47,6 +49,12 @@ export function Dashboard({ data, showActions, loading }: DashboardProps) {
     [removeTracker, data],
   );
 
+  const stackedPosition = (i: number) => ({
+    marginBottom: "-8rem",
+    marginLeft: `${i}rem`,
+    marginRight: `-${i}rem`,
+  });
+
   return (
     <div className="flex w-full gap-2 p-2 text-center">
       {!loading && data!.trackers.length === 0 ? (
@@ -59,20 +67,43 @@ export function Dashboard({ data, showActions, loading }: DashboardProps) {
           }}
         >
           {!loading &&
-            data!.trackers.map((tracker) => (
+            data!.trackers.map((tracker, i) => (
               <TrackerCard
                 key={tracker._id}
                 data={tracker}
+                {...(stacked && {
+                  style: {
+                    ...stackedPosition(i),
+                  },
+                })}
                 {...(showActions && { onRemove: handleRemoveTracker })}
               />
             ))}
 
           {loading &&
-            Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className=" h-60 animate-pulse rounded-lg bg-accent-1" />
+            Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className=" h-60 animate-pulse rounded-lg bg-accent-1"
+                {...(stacked && {
+                  style: {
+                    ...stackedPosition(i),
+                  },
+                })}
+              />
             ))}
         </div>
       )}
     </div>
   );
+}
+
+export function DashboardCC({
+  ...props
+}: Omit<DashboardProps, "loading" | "data"> & { dashboardId?: string }) {
+  const { data, loading } = useQuery(GetDashboardDocument, {
+    variables: { _id: props.dashboardId },
+  });
+
+  return <Dashboard data={data?.dashboard} loading={loading} {...props} />;
 }

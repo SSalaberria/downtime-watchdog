@@ -39,6 +39,8 @@ export function middleware(app: INestApplication): INestApplication {
     },
   );
 
+  httpService.axiosRef.defaults.timeout = 5000;
+
   app.use(compression());
   app.use(
     session({
