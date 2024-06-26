@@ -8,7 +8,7 @@ import type { CreateUserInput } from './dto/create-user.input';
 import type { GetUsersInput } from './dto/get-users.input';
 import type { UpdateUserInput } from './dto/update-user.input';
 import { User, UserDocument } from './entities/user.entity';
-import { UserNotFoundException } from './exceptions';
+import { UserNotAvailableException, UserNotFoundException } from './exceptions';
 import type { Role } from './user.interface';
 
 @Injectable()
@@ -80,8 +80,15 @@ export class UserService {
       await this.dashboards.create({ owner: newUser._id });
 
       return await newUser.save();
-    } catch (err) {
+    } catch (err: any) {
       await session.abortTransaction();
+
+      // Duplicate key exception
+      if (err.code === 11000) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        throw new UserNotAvailableException(Object.keys(err.keyPattern)[0]);
+      }
+
       throw err;
     } finally {
       await session.endSession();

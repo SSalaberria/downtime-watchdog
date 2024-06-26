@@ -32,23 +32,31 @@ export function TrackerDashboard({ tracker }: { tracker: TrackerFragment }) {
         <div className="card px-3 py-5">
           <h4 className="text-xl text-primary">Responses</h4>
           <div className="">
-            {tracker.monthlyAvailability.responses.responseFrequencies.map(
-              ({ response, count }) => {
-                return (
-                  <div key={response} className="flex w-full justify-between">
-                    <p
-                      className={`italic ${
-                        response === "OK" ? AVAILABILITY_COLOR["HIGH"] : AVAILABILITY_COLOR["LOW"]
-                      }`}
-                    >
-                      {response}
-                    </p>
-                    <p className="">
-                      {((count / tracker.monthlyAvailability.responses.total) * 100).toFixed(1)} %
-                    </p>
-                  </div>
-                );
-              },
+            {tracker.monthlyAvailability.responses ? (
+              tracker.monthlyAvailability.responses.responseFrequencies.map(
+                ({ response, count }) => {
+                  return (
+                    <div key={response} className="flex w-full justify-between">
+                      <p
+                        className={`italic ${
+                          response === "OK" ? AVAILABILITY_COLOR["HIGH"] : AVAILABILITY_COLOR["LOW"]
+                        }`}
+                      >
+                        {response}
+                      </p>
+                      <p className="">
+                        {(
+                          (count / (tracker.monthlyAvailability.responses?.total ?? 0)) *
+                          100
+                        ).toFixed(1)}
+                        %
+                      </p>
+                    </div>
+                  );
+                },
+              )
+            ) : (
+              <p className="text-center italic">Not tracked yet</p>
             )}
           </div>
         </div>
@@ -76,12 +84,12 @@ export function TrackerDashboard({ tracker }: { tracker: TrackerFragment }) {
               <StatSection
                 color={
                   RESPONSE_TIME_COLOR[
-                    tracker.monthlyAvailability.latency.minStatus || ResponseTimeStatus.High
+                    tracker.monthlyAvailability.latency?.minStatus || ResponseTimeStatus.High
                   ]
                 }
                 label="Min."
                 value={
-                  tracker.monthlyAvailability.latency.min?.responseTime
+                  tracker.monthlyAvailability.latency?.min?.responseTime
                     ? formatResponseTime(tracker.monthlyAvailability.latency.min.responseTime)
                     : "-"
                 }
@@ -90,12 +98,12 @@ export function TrackerDashboard({ tracker }: { tracker: TrackerFragment }) {
               <StatSection
                 color={
                   RESPONSE_TIME_COLOR[
-                    tracker.monthlyAvailability.latency.maxStatus || ResponseTimeStatus.High
+                    tracker.monthlyAvailability.latency?.maxStatus || ResponseTimeStatus.High
                   ]
                 }
                 label="Max."
                 value={
-                  tracker.monthlyAvailability.latency.max?.responseTime
+                  tracker.monthlyAvailability.latency?.max?.responseTime
                     ? formatResponseTime(tracker.monthlyAvailability.latency.max.responseTime)
                     : "-"
                 }
@@ -104,13 +112,13 @@ export function TrackerDashboard({ tracker }: { tracker: TrackerFragment }) {
               <StatSection
                 color={
                   RESPONSE_TIME_COLOR[
-                    tracker.monthlyAvailability.latency.averageStatus || ResponseTimeStatus.High
+                    tracker.monthlyAvailability.latency?.averageStatus || ResponseTimeStatus.High
                   ]
                 }
                 label="Average"
                 value={
-                  tracker.monthlyAvailability.latency.average
-                    ? formatResponseTime(tracker.monthlyAvailability.latency.average)
+                  tracker.monthlyAvailability.latency?.average
+                    ? formatResponseTime(tracker.monthlyAvailability.latency?.average)
                     : "-"
                 }
               />

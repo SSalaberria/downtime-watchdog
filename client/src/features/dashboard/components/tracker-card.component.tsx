@@ -82,12 +82,12 @@ export const TrackerCard = memo(function TrackerCard({
         <StatSection
           color={
             RESPONSE_TIME_COLOR[
-              data.monthlyAvailability.latency.averageStatus || ResponseTimeStatus.High
+              data.monthlyAvailability.latency?.averageStatus || ResponseTimeStatus.High
             ]
           }
           label="Avg. latency"
           value={
-            data.monthlyAvailability.latency.average
+            data.monthlyAvailability.latency?.average
               ? formatResponseTime(data.monthlyAvailability.latency.average)
               : "-"
           }

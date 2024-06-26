@@ -69,10 +69,10 @@ export class Availability {
   @Field(() => Number, { description: 'Availability threshold of the tracked website' })
   uptime!: number;
 
-  @Field(() => Latency, { description: 'Latency of the tracked website' })
+  @Field(() => Latency, { description: 'Latency of the tracked website', nullable: true })
   latency!: Latency;
 
-  @Field(() => Responses, { description: 'Response frequencies of the tracked website' })
+  @Field(() => Responses, { description: 'Response frequencies of the tracked website', nullable: true })
   responses!: Responses;
 }
 
@@ -115,12 +115,12 @@ TrackerSchema.virtual('monthlyAvailability').get(async function (this: TrackerDo
 
   const { trackingLogs } = this;
 
-  if (!trackingLogs.length) return { uptime: 0, status: AvailabilityStatus.UNKNOWN, responseTime: null };
+  if (!trackingLogs.length) return { uptime: 0, status: AvailabilityStatus.UNKNOWN, responseTime: null, latency: null, responses: null };
 
   const processedData = processLogs(trackingLogs);
 
   const uptime = processedData.upLogs.length / (processedData.upLogs.length + processedData.downLogs.length);
-  const responseTime = processedData.trackedResponseTimes.total / processedData.trackedResponseTimes.count;
+  const avgResponseTime = processedData.trackedResponseTimes.total / processedData.trackedResponseTimes.count;
 
   const status = uptime < AVAILABILITY_THRESHOLDS.LOW
     ? AvailabilityStatus.LOW
@@ -129,8 +129,8 @@ TrackerSchema.virtual('monthlyAvailability').get(async function (this: TrackerDo
       : AvailabilityStatus.HIGH;
 
   const latency = {
-    average: responseTime,
-    averageStatus: getResponseTimeStatus(responseTime),
+    average: avgResponseTime,
+    averageStatus: getResponseTimeStatus(avgResponseTime),
     min: processedData.trackedResponseTimes.min,
     minStatus: getResponseTimeStatus(processedData.trackedResponseTimes.min?.responseTime ?? 0),
     max: processedData.trackedResponseTimes.max,
@@ -144,7 +144,7 @@ TrackerSchema.virtual('monthlyAvailability').get(async function (this: TrackerDo
       .sort((a, b) => b.count - a.count),
   };
 
-  return { uptime, status, responseTime, latency, responses };
+  return { uptime, status, latency, responses };
 });
 
 export { TrackerSchema };

@@ -12,6 +12,11 @@ export function useAuth() {
   const LoginMutation = useMutation(LoginDocument, {
     onCompleted(data) {
       setAuthCookie(data.login.access_token);
+
+      toast("Welcome back!", {
+        icon: "🎉",
+        duration: 6000,
+      });
     },
     onError(error) {
       console.error(error);

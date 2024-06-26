@@ -49,9 +49,13 @@ export function RegisterForm() {
         </div>
       ))}
 
-      {error && <p className="pb-1 text-center text-sm text-red-500">{error.message}</p>}
+      {error && (
+        <p className="pb-1 text-center text-sm text-red-500 first-letter:capitalize">
+          {error.message}
+        </p>
+      )}
       <Button loading={loading} type="submit">
-        Sign up
+        Sign Up
       </Button>
     </form>
   );

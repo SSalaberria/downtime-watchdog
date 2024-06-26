@@ -57,7 +57,7 @@ export function Dashboard({ data, showActions, loading, stacked }: DashboardProp
 
   return (
     <div className="flex w-full gap-2 p-2 text-center">
-      {!loading && data!.trackers.length === 0 ? (
+      {!loading && data?.trackers.length === 0 ? (
         <p className="w-full">No trackers have been added to this dashboard yet.</p>
       ) : (
         <div
@@ -67,7 +67,7 @@ export function Dashboard({ data, showActions, loading, stacked }: DashboardProp
           }}
         >
           {!loading &&
-            data!.trackers.map((tracker, i) => (
+            data?.trackers.map((tracker, i) => (
               <TrackerCard
                 key={tracker._id}
                 data={tracker}
@@ -101,9 +101,13 @@ export function Dashboard({ data, showActions, loading, stacked }: DashboardProp
 export function DashboardCC({
   ...props
 }: Omit<DashboardProps, "loading" | "data"> & { dashboardId?: string }) {
-  const { data, loading } = useQuery(GetDashboardDocument, {
+  const { data, loading, error } = useQuery(GetDashboardDocument, {
     variables: { _id: props.dashboardId },
   });
+
+  if (error) {
+    return <p>An error has occurred trying to load the dashboard.</p>;
+  }
 
   return <Dashboard data={data?.dashboard} loading={loading} {...props} />;
 }

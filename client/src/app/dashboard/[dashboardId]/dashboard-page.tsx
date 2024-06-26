@@ -12,7 +12,7 @@ export default function DashboardPageContent({ dashboardId }: { dashboardId: str
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <h1 className="text-2xl font-medium text-white">{`${data.dashboard.owner.name}'s dashboard`}</h1>
+      <h1 className="pt-12 text-2xl font-medium text-white">{`${data.dashboard.owner.name}'s dashboard`}</h1>
 
       <Dashboard data={data.dashboard} />
     </div>

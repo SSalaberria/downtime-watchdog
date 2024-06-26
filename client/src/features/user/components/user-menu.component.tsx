@@ -18,7 +18,7 @@ const UserMenu = memo(function UserMenu() {
   if (error || !token) {
     return (
       <>
-        <Button onClick={() => setOpenAuthDialog(true)}>Sign in</Button>
+        <Button onClick={() => setOpenAuthDialog(true)}>Sign In</Button>
         {openAuthDialog && <AuthDialog onClose={() => setOpenAuthDialog(false)} />}
       </>
     );

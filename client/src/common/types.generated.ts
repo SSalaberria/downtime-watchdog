@@ -23,9 +23,9 @@ export type AddTrackerInput = {
 export type Availability = {
   __typename?: 'Availability';
   /** Latency of the tracked website */
-  latency: Latency;
+  latency?: Maybe<Latency>;
   /** Response frequencies of the tracked website */
-  responses: Responses;
+  responses?: Maybe<Responses>;
   /** Availability status of the tracked website */
   status: AvailabilityStatus;
   /** Availability threshold of the tracked website */
