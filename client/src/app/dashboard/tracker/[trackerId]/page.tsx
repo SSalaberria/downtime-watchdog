@@ -13,7 +13,7 @@ export default async function TrackerPage({ params }: { params: { trackerId: str
 
   return (
     <div className="mb-12 flex w-full flex-col md:mb-0">
-      <div className="mx-auto flex items-center gap-2 py-2">
+      <div className="mx-auto flex items-center gap-2 py-4 sm:py-2">
         <ImageWithFallback
           alt={`${data.tracker.website} favicon`}
           fallbackSrc="/images/loading.svg"

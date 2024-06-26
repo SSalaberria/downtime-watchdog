@@ -22,7 +22,7 @@ export function TrackerDashboard({ tracker }: { tracker: TrackerFragment }) {
   return (
     <div className="flex w-full flex-col-reverse items-center justify-center gap-8 md:flex-row md:items-start [&>*]:flex [&>*]:flex-col [&>*]:gap-4">
       {/* First col */}
-      <div className="">
+      <div className="w-full sm:w-auto">
         <div className="card px-3 py-5">
           <h4 className="pb-4 text-xl text-primary">History</h4>
           <div className="">

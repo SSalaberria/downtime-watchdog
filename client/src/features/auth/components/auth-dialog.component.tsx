@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 
 import { Dialog } from "~/common/ui";
 
@@ -48,7 +49,8 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
 
   return (
     <Dialog onClose={onClose}>
-      <div className="flex flex-col gap-4 rounded-xl bg-background-primary p-6">
+      <div className="flex flex-col items-center gap-4 rounded-xl bg-background-primary p-6">
+        <Image alt="logo" height={48} src="/images/logo.png" width={48} />
         <h1 className="text-center text-2xl font-semibold">{formsData[form].title}</h1>
         <p className="text-font-secondary text-center text-sm">{formsData[form].description}</p>
         {formsData[form].component}

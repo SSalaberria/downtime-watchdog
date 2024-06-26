@@ -9,3 +9,5 @@ export * from "./expand-icon";
 export * from "./copy-icon";
 
 export * from "./logout-icon";
+
+export * from "./cancel-icon";

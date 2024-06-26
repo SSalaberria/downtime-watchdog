@@ -2,6 +2,8 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
+import { CancelIcon } from "./icons";
+
 interface DialogProps {
   children: React.ReactNode;
   onClose: () => void;
@@ -36,6 +38,7 @@ export const Dialog = ({ children, onClose }: DialogProps) => {
           e?.stopPropagation();
         }}
       >
+        <CancelIcon className="ml-auto w-10 fill-primary sm:hidden" onClick={() => onClose()} />
         {children}
       </div>
     </dialog>,
