@@ -75,6 +75,7 @@ export function Dashboard({ data, showActions, loading, stacked }: DashboardProp
                   style: {
                     ...stackedPosition(i),
                   },
+                  className: "mobile:!mx-0",
                 })}
                 {...(showActions && { onRemove: handleRemoveTracker })}
               />

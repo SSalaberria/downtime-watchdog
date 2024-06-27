@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "~/common/ui/button";
@@ -10,6 +10,7 @@ import { useAuth } from "../hooks";
 export function RegisterForm() {
   const { push } = useRouter();
   const [register, { loading, error }] = useAuth().RegisterMutation;
+  const [clientSideError, setClientSideError] = useState<string | null>();
 
   const formFields = [
     { id: "email", label: "Email", type: "email" },
@@ -22,6 +23,8 @@ export function RegisterForm() {
     async (e: React.FormEvent) => {
       e.preventDefault();
 
+      setClientSideError(null);
+
       const { email, password, repeatedPassword, name } = e.target as typeof e.target & {
         email: { value: string };
         password: { value: string };
@@ -30,6 +33,8 @@ export function RegisterForm() {
       };
 
       if (password.value !== repeatedPassword.value) {
+        setClientSideError("Passwords do not match");
+
         return;
       }
 
@@ -49,9 +54,9 @@ export function RegisterForm() {
         </div>
       ))}
 
-      {error && (
+      {(error || clientSideError) && (
         <p className="pb-1 text-center text-sm text-red-500 first-letter:capitalize">
-          {error.message}
+          {clientSideError || error?.message}
         </p>
       )}
       <Button loading={loading} type="submit">
